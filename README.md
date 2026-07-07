@@ -1,5 +1,7 @@
 # OrbWeather
 
+** Live Demo:** [https://orb-weather.vercel.app/](https://orb-weather.vercel.app/)
+
 OrbWeather is an elite, responsive, and data-rich weather dashboard application engineered with React, TypeScript, and Vite. It provides users with highly accurate, real-time meteorological data, air quality indices, astronomical positioning, and interactive global geocoding.
 
 ## Core Features
@@ -78,4 +80,4 @@ The application is built with a focus on maintainability and performance. State 
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for more information. Copyright (c) 2026 Praneeth Karri.
+This project is licensed under the MIT License. See the `LICENSE` file for more information. Copyright (c) 2026 OrbWeather (Created by Praneeth Karri).
