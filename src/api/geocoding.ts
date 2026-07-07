@@ -1,4 +1,4 @@
-import type { Coordinates, CityMeta } from '../types';
+import type { CityMeta } from '../types';
 
 const GEO_API = 'https://geocoding-api.open-meteo.com/v1/search';
 

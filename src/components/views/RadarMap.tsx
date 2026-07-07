@@ -14,7 +14,7 @@ const customOrbIcon = L.divIcon({
 
 interface RadarMapProps {
   currentCity: CityMeta;
-  onLocationSelect: (lat: number, lon: number) => void;
+  onLocationSelect: (lat: number, lon: number) => Promise<void>;
 }
 
 function MapEvents({ onLocationSelect }: { onLocationSelect: (lat: number, lon: number) => void }) {
@@ -27,6 +27,14 @@ function MapEvents({ onLocationSelect }: { onLocationSelect: (lat: number, lon: 
 }
 
 export function RadarMap({ currentCity, onLocationSelect }: RadarMapProps) {
+  const [isLocating, setIsLocating] = React.useState(false);
+
+  const handleLocationSelect = async (lat: number, lon: number) => {
+    setIsLocating(true);
+    await onLocationSelect(lat, lon);
+    setIsLocating(false);
+  };
+
   return (
     <div className="view-container map-container animate-fade-up">
       <div className="view-header">
@@ -50,7 +58,7 @@ export function RadarMap({ currentCity, onLocationSelect }: RadarMapProps) {
             noWrap={true}
           />
           
-          <MapEvents onLocationSelect={onLocationSelect} />
+          <MapEvents onLocationSelect={handleLocationSelect} />
           
           <Marker position={[currentCity.lat, currentCity.lon]} icon={customOrbIcon}>
             <Popup>
@@ -58,6 +66,12 @@ export function RadarMap({ currentCity, onLocationSelect }: RadarMapProps) {
             </Popup>
           </Marker>
         </MapContainer>
+        
+        {isLocating && (
+          <div className="map-loading-overlay">
+            <div className="map-spinner"></div>
+          </div>
+        )}
       </div>
     </div>
   );

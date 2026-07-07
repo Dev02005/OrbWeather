@@ -7,13 +7,13 @@ import './Sidebar.css';
 interface SidebarProps {
   currentCity: CityMeta | null;
   savedCities: CityMeta[];
-  onCitySelect: (city: CityMeta) => void;
+  onCitySelect: (city: CityMeta) => Promise<void>;
   onSaveCity: (city: CityMeta) => void;
   onRemoveCity: (city: CityMeta) => void;
   isOpen: boolean;
   onClose: () => void;
   onNavigate: (view: 'dashboard' | 'settings' | 'faq' | 'about' | 'radar') => void;
-  onCurrentLocation: () => void;
+  onCurrentLocation: () => Promise<void>;
 }
 
 
@@ -30,6 +30,7 @@ export function Sidebar({
 }: SidebarProps) {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<CityMeta[]>([]);
+  const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -63,11 +64,20 @@ export function Sidebar({
     return () => clearTimeout(delayDebounceFn);
   }, [query]);
 
-  const handleSelect = (city: CityMeta) => {
-    onCitySelect(city);
+  const handleSelect = async (city: CityMeta) => {
+    setLoadingAction(`city-${city.name}`);
+    await onCitySelect(city);
     onNavigate('dashboard');
     setSuggestions([]);
     setQuery('');
+    setLoadingAction(null);
+    onClose();
+  };
+
+  const handleLocateClick = async () => {
+    setLoadingAction('current');
+    await onCurrentLocation();
+    setLoadingAction(null);
     onClose();
   };
 
@@ -105,10 +115,11 @@ export function Sidebar({
               {suggestions.map((city, idx) => (
                 <div key={idx} className="suggestion-item" onClick={() => handleSelect(city)}>
                   <MapPin size={14} className="suggestion-icon" />
-                  <div>
+                  <div style={{ flex: 1 }}>
                     <div className="suggestion-name">{city.name}</div>
                     <div className="suggestion-country">{city.admin1 ? `${city.admin1}, ${city.country}` : city.country}</div>
                   </div>
+                  {loadingAction === `city-${city.name}` && <div className="btn-spinner" />}
                 </div>
               ))}
             </div>
@@ -116,9 +127,10 @@ export function Sidebar({
         </div>
 
         <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <button className="footer-btn" onClick={() => { onCurrentLocation(); onClose(); }}>
+          <button className="footer-btn" onClick={handleLocateClick} disabled={loadingAction === 'current'}>
             <MapPin size={16} />
-            <span>Use Current Location</span>
+            <span style={{ flex: 1, textAlign: 'left' }}>Use Current Location</span>
+            {loadingAction === 'current' && <div className="btn-spinner" />}
           </button>
           <button className="footer-btn" onClick={() => { onNavigate('radar'); onClose(); }}>
             <Map size={16} />
@@ -142,14 +154,18 @@ export function Sidebar({
             {savedCities.length === 0 && <p className="empty-text">No saved cities yet.</p>}
             {savedCities.map((city, idx) => (
               <div key={idx} className={`city-item ${currentCity?.name === city.name ? 'active' : ''}`} onClick={() => handleSelect(city)}>
-                <div className="city-item-left">
+                <div className="city-item-left" style={{ flex: 1 }}>
                   <MapPin size={16} className="city-icon" />
                   <div>
                     <div className="city-name-text">{city.name}</div>
                     <div className="city-country-text">{city.admin1 ? `${city.admin1}, ${city.country}` : city.country}</div>
                   </div>
                 </div>
-                <button className="city-remove-btn" onClick={(e) => { e.stopPropagation(); onRemoveCity(city); }}>✕</button>
+                {loadingAction === `city-${city.name}` ? (
+                  <div className="btn-spinner" />
+                ) : (
+                  <button className="city-remove-btn" onClick={(e) => { e.stopPropagation(); onRemoveCity(city); }}>✕</button>
+                )}
               </div>
             ))}
           </div>
@@ -171,6 +187,9 @@ export function Sidebar({
             <Info size={16} />
             <span>About</span>
           </button>
+          <div className="copyright-text">
+            &copy; {new Date().getFullYear()} OrbWeather
+          </div>
         </div>
       </aside>
     </>

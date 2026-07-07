@@ -23,21 +23,21 @@ function App() {
   const [activeView, setActiveView] = useState<'dashboard' | 'settings' | 'faq' | 'about' | 'radar'>('dashboard');
   
   const [theme, setTheme] = useState<'light' | 'dark'>(
-    (localStorage.getItem('skyscope_theme') as any) || 'light'
+    (localStorage.getItem('orbweather_theme') as any) || 'light'
   );
   const [unit, setUnit] = useState<'celsius' | 'fahrenheit'>(
-    (localStorage.getItem('skyscope_unit') as any) || 'celsius'
+    (localStorage.getItem('orbweather_unit') as any) || 'celsius'
   );
   const [timeFormat, setTimeFormat] = useState<'12h' | '24h'>(
-    (localStorage.getItem('skyscope_timeformat') as any) || '12h'
+    (localStorage.getItem('orbweather_timeformat') as any) || '12h'
   );
   const [notifications, setNotifications] = useState(
-    localStorage.getItem('skyscope_notifications') === 'true'
+    localStorage.getItem('orbweather_notifications') === 'true'
   );
   
   const [currentCity, setCurrentCity] = useState<CityMeta | null>(null);
   const [savedCities, setSavedCities] = useState<CityMeta[]>(
-    JSON.parse(localStorage.getItem('skyscope_saved') || '[]')
+    JSON.parse(localStorage.getItem('orbweather_saved') || '[]')
   );
 
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -47,7 +47,7 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('skyscope_theme', theme);
+    localStorage.setItem('orbweather_theme', theme);
     if (theme === 'dark') {
       document.body.classList.add('dark-theme');
     } else {
@@ -56,18 +56,19 @@ function App() {
   }, [theme]);
 
   useEffect(() => {
-    localStorage.setItem('skyscope_unit', unit);
+    localStorage.setItem('orbweather_unit', unit);
     if (currentCity) {
       loadWeather(currentCity, unit);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unit]);
 
   useEffect(() => {
-    localStorage.setItem('skyscope_timeformat', timeFormat);
+    localStorage.setItem('orbweather_timeformat', timeFormat);
   }, [timeFormat]);
 
   useEffect(() => {
-    localStorage.setItem('skyscope_notifications', String(notifications));
+    localStorage.setItem('orbweather_notifications', String(notifications));
     if (notifications && 'Notification' in window) {
       if (Notification.permission !== 'granted') {
         Notification.requestPermission();
@@ -89,44 +90,49 @@ function App() {
   }, [weather, notifications, currentCity]);
 
   useEffect(() => {
-    localStorage.setItem('skyscope_saved', JSON.stringify(savedCities));
+    localStorage.setItem('orbweather_saved', JSON.stringify(savedCities));
   }, [savedCities]);
 
-  const handleCurrentLocation = () => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          const cityMeta = await reverseGeocode(lat, lon);
-          if (cityMeta) {
-            setCurrentCity(cityMeta);
-            loadWeather(cityMeta, unit);
-            setActiveView('dashboard');
-          }
-        },
-        (error) => {
-          console.warn('Geolocation failed or denied:', error);
-          alert('Could not detect your location. Please check browser permissions.');
-        },
-        { timeout: 10000, enableHighAccuracy: true }
-      );
-    } else {
-      alert('Geolocation is not supported by your browser.');
-    }
+  const handleCurrentLocation = async (): Promise<void> => {
+    return new Promise((resolve) => {
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const cityMeta = await reverseGeocode(lat, lon);
+            if (cityMeta) {
+              setCurrentCity(cityMeta);
+              await loadWeather(cityMeta, unit);
+              setActiveView('dashboard');
+            }
+            resolve();
+          },
+          (error) => {
+            console.warn('Geolocation failed or denied:', error);
+            alert('Could not detect your location. Please check browser permissions.');
+            resolve();
+          },
+          { timeout: 10000, enableHighAccuracy: true }
+        );
+      } else {
+        alert('Geolocation is not supported by your browser.');
+        resolve();
+      }
+    });
   };
 
   const handleMapLocationSelect = async (lat: number, lon: number) => {
     const cityMeta = await reverseGeocode(lat, lon);
     if (cityMeta) {
       setCurrentCity(cityMeta);
-      loadWeather(cityMeta, unit);
+      await loadWeather(cityMeta, unit);
       setActiveView('dashboard');
     }
   };
 
   useEffect(() => {
-    const lastCity = localStorage.getItem('skyscope_last_city');
+    const lastCity = localStorage.getItem('orbweather_last_city');
     if (lastCity) {
       try {
         const c = JSON.parse(lastCity);
@@ -163,6 +169,7 @@ function App() {
       setCurrentCity(fallbackCity);
       loadWeather(fallbackCity, unit);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadWeather = async (city: CityMeta, currentUnit: 'celsius' | 'fahrenheit') => {
@@ -172,17 +179,18 @@ function App() {
       const data = await fetchWeather({ lat: city.lat, lon: city.lon }, currentUnit);
       setWeather(data.weather);
       setAq(data.aq);
-      localStorage.setItem('skyscope_last_city', JSON.stringify(city));
+      localStorage.setItem('orbweather_last_city', JSON.stringify(city));
     } catch (err) {
+      console.error(err);
       setError('Failed to load weather data.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCitySelect = (city: CityMeta) => {
+  const handleCitySelect = async (city: CityMeta) => {
     setCurrentCity(city);
-    loadWeather(city, unit);
+    await loadWeather(city, unit);
   };
 
   const handleSaveCity = (city: CityMeta) => {

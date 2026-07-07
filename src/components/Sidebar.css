@@ -1,6 +1,6 @@
 .sidebar {
   width: var(--sidebar-width);
-  min-height: 100vh;
+  height: 100vh;
   background: var(--bg-secondary);
   border-right: 1px solid var(--glass-border);
   display: flex;
@@ -11,7 +11,7 @@
   top: 0; left: 0;
   z-index: 100;
   transition: transform var(--transition);
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
 }
 
@@ -113,7 +113,34 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.saved-section { display: flex; flex-direction: column; gap: 8px; }
+.saved-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.saved-cities-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.saved-cities-list::-webkit-scrollbar {
+  width: 4px;
+}
+.saved-cities-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.saved-cities-list::-webkit-scrollbar-thumb {
+  background: rgba(14, 165, 233, 0.2);
+  border-radius: 4px;
+}
+.saved-cities-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(14, 165, 233, 0.4);
+}
 .section-header {
   display: flex;
   align-items: center;
@@ -214,5 +241,22 @@
   background: rgba(14, 165, 233, 0.05);
   color: var(--accent-blue);
   border-color: rgba(14, 165, 233, 0.2);
+}
+
+.copyright-text {
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 8px;
+  letter-spacing: 0.02em;
+}
+
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(14, 165, 233, 0.2);
+  border-top-color: var(--accent-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 

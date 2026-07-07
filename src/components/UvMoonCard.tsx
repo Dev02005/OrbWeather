@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Moon, AlertTriangle } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 import './UvMoonCard.css';
 
 interface UvMoonCardProps {
