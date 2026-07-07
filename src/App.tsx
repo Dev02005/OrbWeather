@@ -260,7 +260,7 @@ function App() {
               <>
                 <HeroCard weather={weather} cityMeta={currentCity} unit={unit} timeFormat={timeFormat} />
                 <StatsRow weather={weather} unit={unit} />
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '24px' }}>
                   <UvMoonCard uvIndex={weather.daily.uv_index_max[0] || 0} />
                   <SunArc sunrise={weather.daily.sunrise[0]} sunset={weather.daily.sunset[0]} timeFormat={timeFormat} />
                 </div>

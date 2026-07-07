@@ -1,6 +1,6 @@
 # OrbWeather
 
-**Live Demo:** [https://orb-weather.vercel.app/](https://orb-weather.vercel.app/)
+**🌍 Live Demo:** [https://orb-weather.vercel.app/](https://orb-weather.vercel.app/)
 
 OrbWeather is an elite, responsive, and data-rich weather dashboard application engineered with React, TypeScript, and Vite. It provides users with highly accurate, real-time meteorological data, air quality indices, astronomical positioning, and interactive global geocoding.
 

@@ -119,4 +119,5 @@
   .weekly-icon-wrapper { justify-content: center; }
   .weekly-range { min-width: 120px; gap: 10px; }
   .weekly-bar-track { min-width: 50px; }
+  .weekly-day { width: 70px; }
 }
