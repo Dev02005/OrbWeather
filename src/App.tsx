@@ -89,7 +89,7 @@ function App() {
   const lastAlertTime = React.useRef<number>(0);
 
   useEffect(() => {
-    if (!weather || !notifications || Notification.permission !== 'granted') return;
+    if (!weather || !notifications) return;
     
     const severeCodes = [95, 96, 99, 71, 73, 75, 77, 85, 86];
     if (severeCodes.includes(weather.current.weather_code)) {
@@ -101,33 +101,10 @@ function App() {
           `Severe weather detected in ${currentCity?.name}: ${getWMO(weather.current.weather_code).label}`,
           'alert'
         );
-        // Still show system notification if app is in background
-        if (document.hidden) {
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistration().then(reg => {
-              if (reg) {
-                reg.showNotification('OrbWeather Alert', {
-                  body: `Severe weather detected in ${currentCity?.name}: ${getWMO(weather.current.weather_code).label}`,
-                  icon: '/icon.png'
-                });
-              } else {
-                new Notification('OrbWeather Alert', {
-                  body: `Severe weather detected in ${currentCity?.name}: ${getWMO(weather.current.weather_code).label}`,
-                  icon: '/icon.png'
-                });
-              }
-            });
-          } else {
-            new Notification('OrbWeather Alert', {
-              body: `Severe weather detected in ${currentCity?.name}: ${getWMO(weather.current.weather_code).label}`,
-              icon: '/icon.png'
-            });
-          }
-        }
         lastAlertTime.current = now;
       }
     }
-  }, [weather, notifications, currentCity]);
+  }, [weather, notifications, currentCity, showToast]);
 
   // Background polling for live weather updates
   useEffect(() => {
@@ -204,15 +181,6 @@ function App() {
   const handleLocationAllow = () => {
     setShowLocationPrompt(false);
     setLoading(true);
-    
-    // Ask for notification permissions on first setup
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission().then(perm => {
-        if (perm === 'granted') {
-          setNotifications(true);
-        }
-      });
-    }
 
     const fallbackCity: CityMeta = { name: 'London', countryCode: 'GB', country: 'United Kingdom', lat: 51.5074, lon: -0.1278 };
     if ('geolocation' in navigator) {

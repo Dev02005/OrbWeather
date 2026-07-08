@@ -14,7 +14,7 @@ OrbWeather is an elite, responsive, and data-rich weather dashboard application 
 - **Responsive Fluid Layout**: Engineered with CSS Grid auto-fit and fluid typography (`clamp`) to look stunning on tiny mobile screens, iPads, and ultra-wide 4K displays alike.
 - **Global Search & Geocoding**: Search for millions of cities globally with exact administrative region identification, automatic type-ahead debouncing, and responsive dropdown suggestions.
 - **Persistent Saved Locations**: Save your favorite cities into a quick-access grid within the sidebar that persists across sessions via local storage.
-- **Alert System**: Opt-in to native browser/device notifications for severe weather conditions (e.g., thunderstorms, snow) for your active city.
+- **Alert System**: Opt-in to beautiful, glassmorphic in-app toast notifications for severe weather conditions (e.g., thunderstorms, snow) for your active city.
 - **Premium Aesthetics**: Engineered with a strict glassmorphism design language, dynamic particle backgrounds (using tsparticles) that reflect live weather conditions, and seamless light/dark mode transitions.
 
 ## Project Structure
@@ -23,7 +23,6 @@ OrbWeather is an elite, responsive, and data-rich weather dashboard application 
 OrbWeather/
 ├── src/
 │   ├── api/            # API integration files (weather.ts, geocoding.ts)
-│   ├── assets/         # Static assets (images, icons)
 │   ├── components/     # Reusable UI components (HeroCard, Forecast, Sidebar)
 │   │   └── views/      # Full-page views (Settings, Faq, About, RadarMap)
 │   ├── utils/          # Helper functions and utilities (iconMap.ts)

@@ -17,7 +17,7 @@ export function ContactUs() {
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-primary)' }}>Email Support</h3>
-              <p style={{ margin: '4px 0 0 0', color: 'var(--text-secondary)' }}>orbwheather@gmail.com</p>
+              <a href="mailto:orbwheather@gmail.com" style={{ display: 'inline-block', margin: '4px 0 0 0', color: 'var(--accent-blue)', textDecoration: 'none', fontWeight: 500 }}>orbwheather@gmail.com</a>
             </div>
           </div>
 

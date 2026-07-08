@@ -91,52 +91,8 @@ export function Settings({ theme, setTheme, unit, setUnit, timeFormat, setTimeFo
             <button className={`setting-btn ${!notifications ? 'active' : ''}`} onClick={() => handleNotificationChange(false)}>Disabled</button>
           </div>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '8px' }}>
-            Get alerted instantly if severe weather (like thunderstorms or heavy snow) is detected in your selected city.
+            Get an in-app alert instantly if severe weather (like thunderstorms or heavy snow) is detected in your active city.
           </p>
-          <div style={{ marginTop: '12px' }}>
-            <button 
-              className="setting-btn" 
-              onClick={async () => {
-                if (!('Notification' in window)) {
-                  alert('Notifications are not supported by this browser.');
-                  return;
-                }
-                
-                let perm = Notification.permission;
-                if (perm !== 'granted') {
-                  perm = await Notification.requestPermission();
-                  if (perm !== 'granted') {
-                    alert('Please enable notifications first or check your browser permissions.');
-                    return;
-                  }
-                }
-
-                try {
-                  let swReg = null;
-                  if ('serviceWorker' in navigator) {
-                    swReg = await navigator.serviceWorker.getRegistration();
-                  }
-                  
-                  if (swReg) {
-                    await swReg.showNotification('OrbWeather Test', {
-                      body: 'Notifications are working perfectly!',
-                      icon: '/icon.png'
-                    });
-                  } else {
-                    new Notification('OrbWeather Test', {
-                      body: 'Notifications are working perfectly!',
-                      icon: '/icon.png'
-                    });
-                  }
-                } catch (err) {
-                  console.error('Notification error:', err);
-                  alert('Failed to show notification. Check browser permissions.');
-                }
-              }}
-            >
-              Test Notification
-            </button>
-          </div>
         </div>
 
       </div>
