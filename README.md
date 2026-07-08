@@ -9,10 +9,12 @@ OrbWeather is an elite, responsive, and data-rich weather dashboard application 
 - **Real-Time Predictive Forecasts**: Access up-to-the-minute current weather conditions alongside a highly detailed 24-hour hourly curve (with temperature and precipitation tracking) and a comprehensive 7-day weekly outlook.
 - **Air Quality & Pollution Analysis**: View comprehensive breakdowns of localized air pollutants, including PM2.5, PM10, Nitrogen Dioxide (NO2), and Ozone (O3) concentration levels, sourced directly from Open-Meteo.
 - **Interactive Global Radar**: An integrated Leaflet map featuring custom marker physics and reverse geocoding capabilities. Simply click anywhere on the globe to instantly pull localized weather data and identify the administrative region.
-- **Astronomical Data**: Track precise sunrise, sunset, and daylight duration via an animated Sun Arc visualizer, along with dynamic Moon Phase rendering and UV Index risk assessments.
+- **Custom Notification System**: A built-in, glassmorphic toast notification system that smoothly alerts you to severe weather warnings, settings changes, and saved locations without relying on clunky native browser popups.
+- **Advanced Map Markers**: Interactive map markers that intelligently differentiate between your physical location (pulsing blue dot) and searched cities (custom glassmorphic pin).
+- **Responsive Fluid Layout**: Engineered with CSS Grid auto-fit and fluid typography (`clamp`) to look stunning on tiny mobile screens, iPads, and ultra-wide 4K displays alike.
 - **Global Search & Geocoding**: Search for millions of cities globally with exact administrative region identification, automatic type-ahead debouncing, and responsive dropdown suggestions.
 - **Persistent Saved Locations**: Save your favorite cities into a quick-access grid within the sidebar that persists across sessions via local storage.
-- **Desktop Alert System**: Opt-in to native browser notifications for severe weather conditions (e.g., thunderstorms, snow) for your active city.
+- **Alert System**: Opt-in to native browser/device notifications for severe weather conditions (e.g., thunderstorms, snow) for your active city.
 - **Premium Aesthetics**: Engineered with a strict glassmorphism design language, dynamic particle backgrounds (using tsparticles) that reflect live weather conditions, and seamless light/dark mode transitions.
 
 ## Project Structure

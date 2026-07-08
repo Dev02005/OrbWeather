@@ -1,5 +1,6 @@
 import React from 'react';
 import { Moon, Sun, Thermometer, Clock, AlertTriangle } from 'lucide-react';
+import { useToast } from '../../contexts/ToastContext';
 import './Views.css';
 
 interface SettingsProps {
@@ -14,6 +15,32 @@ interface SettingsProps {
 }
 
 export function Settings({ theme, setTheme, unit, setUnit, timeFormat, setTimeFormat, notifications, setNotifications }: SettingsProps) {
+  const { showToast } = useToast();
+
+  const handleThemeChange = (newTheme: 'light' | 'dark') => {
+    setTheme(newTheme);
+    showToast('Theme Updated', `Theme set to ${newTheme} mode.`, 'success');
+  };
+
+  const handleUnitChange = (newUnit: 'celsius' | 'fahrenheit') => {
+    setUnit(newUnit);
+    showToast('Unit Updated', `Temperature set to ${newUnit === 'celsius' ? 'Celsius (°C)' : 'Fahrenheit (°F)'}.`, 'success');
+  };
+
+  const handleTimeFormatChange = (newFormat: '12h' | '24h') => {
+    setTimeFormat(newFormat);
+    showToast('Time Format Updated', `Time format set to ${newFormat}.`, 'success');
+  };
+
+  const handleNotificationChange = (newVal: boolean) => {
+    setNotifications(newVal);
+    if (newVal) {
+      showToast('Notifications Enabled', 'You will now receive alerts for severe weather.', 'success');
+    } else {
+      showToast('Notifications Disabled', 'Severe weather alerts have been muted.', 'info');
+    }
+  };
+
   return (
     <div className="view-container animate-fade-up">
       <div className="view-header">
@@ -27,8 +54,8 @@ export function Settings({ theme, setTheme, unit, setUnit, timeFormat, setTimeFo
             <h2>Theme</h2>
           </div>
           <div className="settings-options">
-            <button className={`setting-btn ${theme === 'light' ? 'active' : ''}`} onClick={() => setTheme('light')}>Light</button>
-            <button className={`setting-btn ${theme === 'dark' ? 'active' : ''}`} onClick={() => setTheme('dark')}>Dark</button>
+            <button className={`setting-btn ${theme === 'light' ? 'active' : ''}`} onClick={() => handleThemeChange('light')}>Light</button>
+            <button className={`setting-btn ${theme === 'dark' ? 'active' : ''}`} onClick={() => handleThemeChange('dark')}>Dark</button>
           </div>
         </div>
 
@@ -38,8 +65,8 @@ export function Settings({ theme, setTheme, unit, setUnit, timeFormat, setTimeFo
             <h2>Temperature Unit</h2>
           </div>
           <div className="settings-options">
-            <button className={`setting-btn ${unit === 'celsius' ? 'active' : ''}`} onClick={() => setUnit('celsius')}>Celsius (°C)</button>
-            <button className={`setting-btn ${unit === 'fahrenheit' ? 'active' : ''}`} onClick={() => setUnit('fahrenheit')}>Fahrenheit (°F)</button>
+            <button className={`setting-btn ${unit === 'celsius' ? 'active' : ''}`} onClick={() => handleUnitChange('celsius')}>Celsius (°C)</button>
+            <button className={`setting-btn ${unit === 'fahrenheit' ? 'active' : ''}`} onClick={() => handleUnitChange('fahrenheit')}>Fahrenheit (°F)</button>
           </div>
         </div>
 
@@ -49,23 +76,40 @@ export function Settings({ theme, setTheme, unit, setUnit, timeFormat, setTimeFo
             <h2>Time Format</h2>
           </div>
           <div className="settings-options">
-            <button className={`setting-btn ${timeFormat === '12h' ? 'active' : ''}`} onClick={() => setTimeFormat('12h')}>12-Hour (AM/PM)</button>
-            <button className={`setting-btn ${timeFormat === '24h' ? 'active' : ''}`} onClick={() => setTimeFormat('24h')}>24-Hour</button>
+            <button className={`setting-btn ${timeFormat === '12h' ? 'active' : ''}`} onClick={() => handleTimeFormatChange('12h')}>12-Hour (AM/PM)</button>
+            <button className={`setting-btn ${timeFormat === '24h' ? 'active' : ''}`} onClick={() => handleTimeFormatChange('24h')}>24-Hour</button>
           </div>
         </div>
 
         <div className="settings-section">
           <div className="settings-section-header">
             <AlertTriangle size={20} />
-            <h2>Desktop Notifications</h2>
+            <h2>Notifications</h2>
           </div>
           <div className="settings-options">
-            <button className={`setting-btn ${notifications ? 'active' : ''}`} onClick={() => setNotifications(true)}>Enabled</button>
-            <button className={`setting-btn ${!notifications ? 'active' : ''}`} onClick={() => setNotifications(false)}>Disabled</button>
+            <button className={`setting-btn ${notifications ? 'active' : ''}`} onClick={() => handleNotificationChange(true)}>Enabled</button>
+            <button className={`setting-btn ${!notifications ? 'active' : ''}`} onClick={() => handleNotificationChange(false)}>Disabled</button>
           </div>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '8px' }}>
             Get alerted instantly if severe weather (like thunderstorms or heavy snow) is detected in your selected city.
           </p>
+          <div style={{ marginTop: '12px' }}>
+            <button 
+              className="setting-btn" 
+              onClick={() => {
+                if ('Notification' in window && Notification.permission === 'granted') {
+                  new Notification('OrbWeather Test', {
+                    body: 'Notifications are working perfectly!',
+                    icon: '/favicon.ico'
+                  });
+                } else {
+                  alert('Please enable notifications first or check your browser permissions.');
+                }
+              }}
+            >
+              Test Notification
+            </button>
+          </div>
         </div>
 
       </div>

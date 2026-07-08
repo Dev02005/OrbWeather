@@ -24,6 +24,20 @@ export function About() {
         <div style={{ padding: '16px', background: 'rgba(239, 68, 68, 0.1)', borderLeft: '4px solid #ef4444', borderRadius: '8px', margin: '32px 0 0 0' }}>
           <strong>Caution:</strong> The weather forecasts, air quality indices, and other meteorological data provided by this application are model-based predictions. While we strive for accuracy using advanced models, these are not absolute certainties and should not be used as the sole source of information for critical decisions or safety planning.
         </div>
+
+        <hr style={{ border: 'none', borderTop: '1px solid var(--glass-border)', margin: '40px 0' }} />
+
+        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <a href="/privacy" className="setting-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+            Privacy Policy
+          </a>
+          <a href="/terms" className="setting-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+            Terms of Usage
+          </a>
+          <a href="/contact" className="setting-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+            Contact Us
+          </a>
+        </div>
       </div>
     </div>
   );

@@ -86,6 +86,18 @@ export function AirQuality({ aq }: AirQualityProps) {
           ))}
         </div>
       </div>
+
+      <div className="aq-legend">
+        {aqiBands.map((b, idx) => (
+          <div key={idx} className="aq-legend-item">
+            <span className="aq-legend-color" style={{ backgroundColor: b.color }}></span>
+            <span className="aq-legend-label">{b.label}</span>
+            <span className="aq-legend-range">
+              {idx === 0 ? '0' : aqiBands[idx - 1].max + 1}-{b.max === 999 ? '+' : b.max}
+            </span>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

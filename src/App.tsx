@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Search } from 'lucide-react';
+import { Menu, Search, CloudRain } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
 import { HeroCard } from './components/HeroCard';
 import { StatsRow } from './components/StatsRow';
@@ -10,16 +10,23 @@ import { Settings } from './components/views/Settings';
 import { Faq } from './components/views/Faq';
 import { About } from './components/views/About';
 import { RadarMap } from './components/views/RadarMap';
+import { LandingPage } from './components/views/LandingPage';
+import { LocationPromptModal } from './components/LocationPromptModal';
 import { WeatherBackground } from './components/WeatherBackground';
 import { UvMoonCard } from './components/UvMoonCard';
 import { SunArc } from './components/SunArc';
 import { fetchWeather } from './api/weather';
 import { reverseGeocode } from './api/geocoding';
 import { getWMO } from './api/weather';
+import { useToast } from './contexts/ToastContext';
 import type { CityMeta, WeatherData, AirQualityData } from './types';
 import './App.css';
 
 function App() {
+  const [hasStarted, setHasStarted] = useState(() => {
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
+    return isPWA || localStorage.getItem('orbweather_started') === 'true';
+  });
   const [activeView, setActiveView] = useState<'dashboard' | 'settings' | 'faq' | 'about' | 'radar'>('dashboard');
   
   const [theme, setTheme] = useState<'light' | 'dark'>(
@@ -45,6 +52,9 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
+  
+  const { showToast } = useToast();
 
   useEffect(() => {
     localStorage.setItem('orbweather_theme', theme);
@@ -76,18 +86,44 @@ function App() {
     }
   }, [notifications]);
 
+  const lastAlertTime = React.useRef<number>(0);
+
   useEffect(() => {
     if (!weather || !notifications || Notification.permission !== 'granted') return;
     
-    // Check if current weather code is severe (Thunderstorms or Snow/Hail)
     const severeCodes = [95, 96, 99, 71, 73, 75, 77, 85, 86];
     if (severeCodes.includes(weather.current.weather_code)) {
-      new Notification('OrbWeather Alert', {
-        body: `Severe weather detected in ${currentCity?.name}: ${getWMO(weather.current.weather_code).label}`,
-        icon: '/favicon.ico'
-      });
+      const now = Date.now();
+      // Rate limit: only alert once every 2 hours to avoid spamming during a long storm
+      if (now - lastAlertTime.current > 7200000) {
+        showToast(
+          'Severe Weather Alert',
+          `Severe weather detected in ${currentCity?.name}: ${getWMO(weather.current.weather_code).label}`,
+          'alert'
+        );
+        // Still show system notification if app is in background
+        if (document.hidden) {
+          new Notification('OrbWeather Alert', {
+            body: `Severe weather detected in ${currentCity?.name}: ${getWMO(weather.current.weather_code).label}`,
+            icon: '/favicon.svg'
+          });
+        }
+        lastAlertTime.current = now;
+      }
     }
   }, [weather, notifications, currentCity]);
+
+  // Background polling for live weather updates
+  useEffect(() => {
+    if (!notifications || !currentCity) return;
+    
+    // Poll every 15 minutes (900000 ms) to check for incoming severe weather
+    const interval = setInterval(() => {
+      loadWeather(currentCity, unit);
+    }, 900000);
+
+    return () => clearInterval(interval);
+  }, [notifications, currentCity, unit]);
 
   useEffect(() => {
     localStorage.setItem('orbweather_saved', JSON.stringify(savedCities));
@@ -105,18 +141,19 @@ function App() {
               setCurrentCity(cityMeta);
               await loadWeather(cityMeta, unit);
               setActiveView('dashboard');
+              showToast('Location Found', `Successfully localized to ${cityMeta.name}`, 'success');
             }
             resolve();
           },
           (error) => {
             console.warn('Geolocation failed or denied:', error);
-            alert('Could not detect your location. Please check browser permissions.');
+            showToast('Location Error', 'Could not detect your location. Please check browser permissions.', 'error');
             resolve();
           },
           { timeout: 10000, enableHighAccuracy: true }
         );
       } else {
-        alert('Geolocation is not supported by your browser.');
+        showToast('Not Supported', 'Geolocation is not supported by your browser.', 'error');
         resolve();
       }
     });
@@ -142,7 +179,15 @@ function App() {
       } catch { }
     }
 
-    // If no last city, try to get current location on mount
+    // If no last city, show location prompt modal instead of automatically asking
+    setShowLocationPrompt(true);
+    setLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleLocationAllow = () => {
+    setShowLocationPrompt(false);
+    setLoading(true);
     const fallbackCity: CityMeta = { name: 'London', countryCode: 'GB', country: 'United Kingdom', lat: 51.5074, lon: -0.1278 };
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -169,8 +214,13 @@ function App() {
       setCurrentCity(fallbackCity);
       loadWeather(fallbackCity, unit);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  };
+
+  const handleLocationDeny = () => {
+    setShowLocationPrompt(false);
+    // Open sidebar so they can search
+    setSidebarOpen(true);
+  };
 
   const loadWeather = async (city: CityMeta, currentUnit: 'celsius' | 'fahrenheit') => {
     setLoading(true);
@@ -197,12 +247,23 @@ function App() {
     const exists = savedCities.find(c => c.name === city.name && c.lat === city.lat);
     if (!exists) {
       setSavedCities([...savedCities, city]);
+      showToast('City Saved', `${city.name} has been added to your saved cities.`, 'success');
     }
   };
 
   const handleRemoveCity = (city: CityMeta) => {
     setSavedCities(savedCities.filter(c => !(c.name === city.name && c.lat === city.lat)));
+    showToast('City Removed', `${city.name} has been removed.`, 'info');
   };
+
+  const handleStart = () => {
+    localStorage.setItem('orbweather_started', 'true');
+    setHasStarted(true);
+  };
+
+  if (!hasStarted) {
+    return <LandingPage onStart={handleStart} />;
+  }
 
   return (
     <div className="app">
@@ -223,7 +284,10 @@ function App() {
           <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>
             <Menu size={24} />
           </button>
-          <span className="mobile-logo" onClick={() => setActiveView('dashboard')} style={{ cursor: 'pointer' }}>OrbWeather</span>
+          <div className="mobile-logo" onClick={() => setActiveView('dashboard')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CloudRain size={20} />
+            <span>OrbWeather</span>
+          </div>
           <button className="mobile-search-btn" onClick={() => setSidebarOpen(true)}>
             <Search size={20} />
           </button>
@@ -232,6 +296,13 @@ function App() {
         <div className="weather-dashboard">
           {weather && <WeatherBackground weatherCode={weather.current.weather_code} />}
           
+          {showLocationPrompt && (
+            <LocationPromptModal 
+              onAllow={handleLocationAllow} 
+              onDeny={handleLocationDeny} 
+            />
+          )}
+
           {activeView === 'settings' && (
             <Settings 
               theme={theme} setTheme={setTheme} 

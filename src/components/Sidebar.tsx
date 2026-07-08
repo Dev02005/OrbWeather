@@ -1,7 +1,7 @@
 import type { CityMeta } from '../types';
 import { fetchSuggestions } from '../api/geocoding';
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, MapPin, Globe, Check, Settings, HelpCircle, Info, Map } from 'lucide-react';
+import { Search, MapPin, CloudRain, Check, Settings, HelpCircle, Info, Map } from 'lucide-react';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -89,7 +89,7 @@ export function Sidebar({
       <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <div className="logo" onClick={() => { onNavigate('dashboard'); onClose(); }} style={{ cursor: 'pointer' }}>
-            <Globe className="logo-icon" size={28} />
+            <CloudRain className="logo-icon" size={28} />
             <span className="logo-text">OrbWeather</span>
           </div>
         </div>

@@ -127,7 +127,7 @@
   50% { opacity: 0.8; transform: scale(1.1); }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .hero-content { flex-direction: column-reverse; align-items: flex-start; gap: 24px; padding: 28px 24px; }
   .hero-right { align-self: flex-end; }
   .hero-weather-icon { width: 100px; height: 100px; }

@@ -114,7 +114,7 @@
   background: linear-gradient(90deg, var(--accent-blue), var(--accent-violet));
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .weekly-desc { display: none; }
   .weekly-icon-wrapper { justify-content: center; }
   .weekly-range { min-width: 120px; gap: 10px; }
