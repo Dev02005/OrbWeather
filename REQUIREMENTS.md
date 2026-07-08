@@ -40,6 +40,7 @@ OrbWeather relies entirely on free, open APIs that do not require API keys for s
    - **Endpoint**: `https://api.bigdatacloud.net/data/reverse-geocode-client`
    - **Usage**: Used to convert the user's current GPS location or map clicks back into a readable city name and region.
 
-## Storage Requirements
+## Storage & Browser Requirements
 
-- **Local Storage (`window.localStorage`)**: The app requires local storage access to persist user settings (theme, units, time format, notifications toggle) and saved favorite cities. 
+- **Local Storage (`window.localStorage`)**: The app requires local storage access to persist user settings (theme, units, time format, in-app notifications toggle) and saved favorite cities.
+- **Service Workers & PWA Support**: Requires modern browser support for Service Workers (`sw.js`) and Web App Manifests to enable the "Add to Home Screen" Progressive Web App (PWA) installation and offline navigation fallback.
