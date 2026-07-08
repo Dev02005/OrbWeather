@@ -96,14 +96,41 @@ export function Settings({ theme, setTheme, unit, setUnit, timeFormat, setTimeFo
           <div style={{ marginTop: '12px' }}>
             <button 
               className="setting-btn" 
-              onClick={() => {
-                if ('Notification' in window && Notification.permission === 'granted') {
-                  new Notification('OrbWeather Test', {
-                    body: 'Notifications are working perfectly!',
-                    icon: '/favicon.ico'
-                  });
-                } else {
-                  alert('Please enable notifications first or check your browser permissions.');
+              onClick={async () => {
+                if (!('Notification' in window)) {
+                  alert('Notifications are not supported by this browser.');
+                  return;
+                }
+                
+                let perm = Notification.permission;
+                if (perm !== 'granted') {
+                  perm = await Notification.requestPermission();
+                  if (perm !== 'granted') {
+                    alert('Please enable notifications first or check your browser permissions.');
+                    return;
+                  }
+                }
+
+                try {
+                  let swReg = null;
+                  if ('serviceWorker' in navigator) {
+                    swReg = await navigator.serviceWorker.getRegistration();
+                  }
+                  
+                  if (swReg) {
+                    await swReg.showNotification('OrbWeather Test', {
+                      body: 'Notifications are working perfectly!',
+                      icon: '/icon.png'
+                    });
+                  } else {
+                    new Notification('OrbWeather Test', {
+                      body: 'Notifications are working perfectly!',
+                      icon: '/icon.png'
+                    });
+                  }
+                } catch (err) {
+                  console.error('Notification error:', err);
+                  alert('Failed to show notification. Check browser permissions.');
                 }
               }}
             >

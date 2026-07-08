@@ -103,10 +103,26 @@ function App() {
         );
         // Still show system notification if app is in background
         if (document.hidden) {
-          new Notification('OrbWeather Alert', {
-            body: `Severe weather detected in ${currentCity?.name}: ${getWMO(weather.current.weather_code).label}`,
-            icon: '/favicon.svg'
-          });
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistration().then(reg => {
+              if (reg) {
+                reg.showNotification('OrbWeather Alert', {
+                  body: `Severe weather detected in ${currentCity?.name}: ${getWMO(weather.current.weather_code).label}`,
+                  icon: '/icon.png'
+                });
+              } else {
+                new Notification('OrbWeather Alert', {
+                  body: `Severe weather detected in ${currentCity?.name}: ${getWMO(weather.current.weather_code).label}`,
+                  icon: '/icon.png'
+                });
+              }
+            });
+          } else {
+            new Notification('OrbWeather Alert', {
+              body: `Severe weather detected in ${currentCity?.name}: ${getWMO(weather.current.weather_code).label}`,
+              icon: '/icon.png'
+            });
+          }
         }
         lastAlertTime.current = now;
       }
@@ -188,6 +204,16 @@ function App() {
   const handleLocationAllow = () => {
     setShowLocationPrompt(false);
     setLoading(true);
+    
+    // Ask for notification permissions on first setup
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().then(perm => {
+        if (perm === 'granted') {
+          setNotifications(true);
+        }
+      });
+    }
+
     const fallbackCity: CityMeta = { name: 'London', countryCode: 'GB', country: 'United Kingdom', lat: 51.5074, lon: -0.1278 };
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(

@@ -7,6 +7,16 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  // Pass through all network requests
-  e.respondWith(fetch(e.request));
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).then(response => {
+        if (!response.ok) {
+          return fetch('/index.html');
+        }
+        return response;
+      }).catch(() => fetch('/index.html'))
+    );
+  } else {
+    e.respondWith(fetch(e.request));
+  }
 });
