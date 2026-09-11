@@ -1,11 +1,12 @@
-import React from 'react';
 import { Droplets, Wind, Eye, Gauge, Sunrise, Sunset, Navigation } from 'lucide-react';
 import type { WeatherData } from '../types';
+import { formatWallClockTime } from '../utils/time';
 import './StatsRow.css';
 
 interface StatsRowProps {
   weather: WeatherData;
   unit: 'celsius' | 'fahrenheit';
+  timeFormat: '12h' | '24h';
 }
 
 function degreesToCardinal(deg: number) {
@@ -13,16 +14,15 @@ function degreesToCardinal(deg: number) {
   return dirs[Math.round(deg / 45) % 8];
 }
 
-function formatSunTime(isoStr: string) {
-  if (!isoStr) return '--';
-  return new Date(isoStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-export function StatsRow({ weather, unit }: StatsRowProps) {
+export function StatsRow({ weather, unit, timeFormat }: StatsRowProps) {
   const c = weather.current;
   const windLabel = unit === 'celsius' ? `${Math.round(c.wind_speed_10m)} km/h` : `${Math.round(c.wind_speed_10m)} mph`;
   const windDeg = c.wind_direction_10m || 0;
-  const vis = c.visibility != null ? (c.visibility / 1000).toFixed(1) : '--';
+  // The API reports visibility in metres regardless of the temperature unit.
+  const visUnit = unit === 'celsius' ? 'km' : 'mi';
+  const vis = c.visibility != null
+    ? (c.visibility / (unit === 'celsius' ? 1000 : 1609.34)).toFixed(1)
+    : '--';
 
   return (
     <section className="stats-row animate-fade-up" style={{ animationDelay: '0.1s' }}>
@@ -56,7 +56,7 @@ export function StatsRow({ weather, unit }: StatsRowProps) {
         <Eye className="stat-icon text-indigo" />
         <div className="stat-info">
           <span className="stat-label">Visibility</span>
-          <span className="stat-value">{vis} km</span>
+          <span className="stat-value">{vis} {visUnit}</span>
         </div>
       </div>
 
@@ -72,7 +72,7 @@ export function StatsRow({ weather, unit }: StatsRowProps) {
         <Sunrise className="stat-icon text-amber" />
         <div className="stat-info">
           <span className="stat-label">Sunrise</span>
-          <span className="stat-value">{formatSunTime(weather.daily.sunrise[0])}</span>
+          <span className="stat-value">{formatWallClockTime(weather.daily.sunrise[0], timeFormat)}</span>
         </div>
       </div>
 
@@ -80,7 +80,7 @@ export function StatsRow({ weather, unit }: StatsRowProps) {
         <Sunset className="stat-icon text-rose" />
         <div className="stat-info">
           <span className="stat-label">Sunset</span>
-          <span className="stat-value">{formatSunTime(weather.daily.sunset[0])}</span>
+          <span className="stat-value">{formatWallClockTime(weather.daily.sunset[0], timeFormat)}</span>
         </div>
       </div>
 

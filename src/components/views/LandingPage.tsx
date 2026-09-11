@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import type { BeforeInstallPromptEvent } from '../../types';
 import { CloudRain, Wind, Sun, ArrowRight, Download, X, Smartphone, Map } from 'lucide-react';
+import { InstallInstructions } from '../InstallInstructions';
 import './LandingPage.css';
 
 interface LandingPageProps {
@@ -8,13 +10,14 @@ interface LandingPageProps {
 
 export function LandingPage({ onStart }: LandingPageProps) {
   const [showDownloadPopup, setShowDownloadPopup] = useState(false);
-  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showSteps, setShowSteps] = useState(false);
 
   useEffect(() => {
     // Listen for PWA install prompt
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setInstallPrompt(e);
+      setInstallPrompt(e as BeforeInstallPromptEvent);
     };
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
@@ -38,8 +41,9 @@ export function LandingPage({ onStart }: LandingPageProps) {
       }
       setShowDownloadPopup(false);
     } else {
-      alert('To install the app, click "Add to Home Screen" or the Install icon in your browser menu. OrbWeather is a Progressive Web App (PWA).');
-      setShowDownloadPopup(false);
+      // Safari, Firefox and iOS never fire beforeinstallprompt, so there is no
+      // native prompt to show — walk the user through their browser's own menu.
+      setShowSteps(true);
     }
   };
 
@@ -47,18 +51,41 @@ export function LandingPage({ onStart }: LandingPageProps) {
     <div className="landing-container">
       {showDownloadPopup && (
         <div className="download-overlay animate-fade-in">
-          <div className="download-popup animate-fade-up">
-            <button className="popup-close" onClick={() => setShowDownloadPopup(false)}>
-              <X size={20} />
+          <div
+            className="download-popup animate-fade-up"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="install-popup-title"
+          >
+            <button
+              className="popup-close"
+              onClick={() => setShowDownloadPopup(false)}
+              aria-label="Close"
+            >
+              <X size={20} aria-hidden="true" />
             </button>
             <div className="popup-icon-wrapper">
-              <Smartphone size={32} className="text-blue" />
+              <Smartphone size={32} className="text-blue" aria-hidden="true" />
             </div>
-            <h3>Get the OrbWeather App</h3>
-            <p>Experience seamless weather tracking on the go. Available for iOS and Android.</p>
-            <button className="btn-download" onClick={handleDownload}>
-              <Download size={18} /> Download Now
-            </button>
+            <h3 id="install-popup-title">Install OrbWeather</h3>
+            {showSteps ? (
+              <>
+                <InstallInstructions />
+                <button className="btn-download" onClick={() => setShowDownloadPopup(false)}>
+                  Got it
+                </button>
+              </>
+            ) : (
+              <>
+                <p>
+                  Add it to your phone or computer — no app store needed. Installed, it opens
+                  like an app and can send you weather alerts.
+                </p>
+                <button className="btn-download" onClick={handleDownload}>
+                  <Download size={18} aria-hidden="true" /> Install App
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

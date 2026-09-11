@@ -1,0 +1,7 @@
+# Keep line endings LF in the repository regardless of the editor's platform.
+* text=auto eol=lf
+
+# Binary assets must never be touched by line-ending conversion.
+*.png binary
+*.jpg binary
+*.ico binary

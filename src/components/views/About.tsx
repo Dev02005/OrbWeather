@@ -1,4 +1,3 @@
-import React from 'react';
 import './Views.css';
 
 export function About() {

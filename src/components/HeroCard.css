@@ -128,7 +128,16 @@
 }
 
 @media (max-width: 768px) {
-  .hero-content { flex-direction: column-reverse; align-items: flex-start; gap: 24px; padding: 28px 24px; }
-  .hero-right { align-self: flex-end; }
-  .hero-weather-icon { width: 100px; height: 100px; }
+  /* The desktop min-height leaves a large dead band above the city name once
+     the layout stacks, so let the card size to its content instead. */
+  .hero-card { min-height: 0; }
+  .hero-content {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px 22px 24px;
+    min-height: 0;
+  }
+  .hero-right { align-self: flex-end; margin-bottom: -12px; }
+  .hero-weather-icon { width: 84px; height: 84px; }
 }

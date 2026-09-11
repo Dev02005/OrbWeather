@@ -1,4 +1,3 @@
-import React from 'react';
 import { Sun, Moon } from 'lucide-react';
 import './UvMoonCard.css';
 
@@ -38,10 +37,10 @@ export function UvMoonCard({ uvIndex }: UvMoonCardProps) {
   return (
     <section className="uv-moon-card animate-fade-up" style={{ animationDelay: '0.2s' }}>
       <div className="um-column">
-        <div className="um-header">
+        <h2 className="um-header">
           <Sun size={20} className="um-icon" style={{ color: uvRisk.color }} />
           <span>UV Index</span>
-        </div>
+        </h2>
         <div className="um-body">
           <div className="uv-value" style={{ color: uvRisk.color }}>{Math.round(uvIndex)}</div>
           <div className="uv-info">
@@ -54,10 +53,10 @@ export function UvMoonCard({ uvIndex }: UvMoonCardProps) {
       <div className="um-divider"></div>
       
       <div className="um-column">
-        <div className="um-header">
+        <h2 className="um-header">
           <Moon size={20} className="um-icon" />
           <span>Moon Phase</span>
-        </div>
+        </h2>
         <div className="um-body">
           <div className="moon-emoji">{moon.emoji}</div>
           <div className="moon-info">

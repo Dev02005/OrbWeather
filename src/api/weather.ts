@@ -3,9 +3,15 @@ import type { Coordinates, WeatherData, AirQualityData } from '../types';
 const WEATHER_API = 'https://api.open-meteo.com/v1/forecast';
 const AQ_API = 'https://air-quality-api.open-meteo.com/v1/air-quality';
 
+/** Thrown when a request is superseded; callers ignore it rather than showing an error. */
+export function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === 'AbortError';
+}
+
 export async function fetchWeather(
   coords: Coordinates,
-  unit: 'celsius' | 'fahrenheit'
+  unit: 'celsius' | 'fahrenheit',
+  signal?: AbortSignal
 ): Promise<{ weather: WeatherData; aq: AirQualityData }> {
   const unitParam = unit === 'celsius' ? 'celsius' : 'fahrenheit';
   const windUnit = unit === 'celsius' ? 'kmh' : 'mph';
@@ -33,15 +39,15 @@ export async function fetchWeather(
   const aqURL = `${AQ_API}?${aqParams.toString()}`;
 
   const [weatherRes, aqRes] = await Promise.all([
-    fetch(weatherURL),
-    fetch(aqURL),
+    fetch(weatherURL, { signal }),
+    fetch(aqURL, { signal }),
   ]);
 
   if (!weatherRes.ok) throw new Error('Failed to fetch weather data');
   if (!aqRes.ok) throw new Error('Failed to fetch air quality data');
 
-  const weather = await weatherRes.json();
-  const aq = await aqRes.json();
+  const weather = (await weatherRes.json()) as WeatherData;
+  const aq = (await aqRes.json()) as AirQualityData;
 
   return { weather, aq };
 }

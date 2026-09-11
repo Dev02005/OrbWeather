@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Globe2 } from 'lucide-react';
 import type { CityMeta, WeatherData } from '../types';
 import { fetchWeather, getWMO } from '../api/weather';
@@ -41,10 +41,10 @@ export function WorldCities({ unit, savedCities, onCitySelect }: WorldCitiesProp
 
   return (
     <section className="world-section animate-fade-up" style={{ animationDelay: '0.4s' }}>
-      <div className="section-title">
+      <h2 className="section-title">
         <Globe2 size={16} />
         <span>Saved Locations</span>
-      </div>
+      </h2>
       
       <div className="world-cities-grid">
         {savedCities.map((city, idx) => {

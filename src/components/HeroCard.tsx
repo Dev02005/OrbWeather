@@ -1,4 +1,3 @@
-import React from 'react';
 import { MapPin } from 'lucide-react';
 import type { WeatherData, CityMeta } from '../types';
 import { getWMO } from '../api/weather';

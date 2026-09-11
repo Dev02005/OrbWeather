@@ -1,4 +1,3 @@
-import React from 'react';
 import { Wind } from 'lucide-react';
 import type { AirQualityData } from '../types';
 import './AirQuality.css';
@@ -37,10 +36,10 @@ export function AirQuality({ aq }: AirQualityProps) {
 
   return (
     <section className="aq-section animate-fade-up" style={{ animationDelay: '0.3s' }}>
-      <div className="section-title">
+      <h2 className="section-title">
         <Wind size={16} />
         <span>Air Quality Index</span>
-      </div>
+      </h2>
       
       <div className="aq-card">
         <div className="aq-gauge">

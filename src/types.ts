@@ -53,3 +53,19 @@ export interface AirQualityData {
     european_aqi: number;
   };
 }
+
+/**
+ * Chromium's PWA install prompt. Not part of lib.dom, so it is declared here
+ * rather than reaching for `any` at the call site.
+ */
+export interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[];
+  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+  prompt(): Promise<void>;
+}
+
+declare global {
+  interface WindowEventMap {
+    beforeinstallprompt: BeforeInstallPromptEvent;
+  }
+}

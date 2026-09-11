@@ -3,6 +3,8 @@ import { Clock, CalendarDays, Droplets } from 'lucide-react';
 import type { WeatherData } from '../types';
 import { getWMO } from '../api/weather';
 import { getWeatherIcon } from '../utils/iconMap';
+import { cityNow } from '../utils/time';
+import { formatDay, formatHour, isDaylightAt } from '../utils/forecast';
 import './Forecast.css';
 
 interface ForecastProps {
@@ -10,28 +12,12 @@ interface ForecastProps {
   timeFormat: '12h' | '24h';
 }
 
-function formatHour(isoStr: string, timeFormat: '12h' | '24h') {
-  const d = new Date(isoStr);
-  const h = d.getHours();
-  if (timeFormat === '24h') {
-    return `${h.toString().padStart(2, '0')}:00`;
-  }
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  return `${h % 12 || 12}${ampm}`;
-}
-
-function formatDay(isoStr: string) {
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  return days[new Date(isoStr).getDay()];
-}
-
 export function Forecast({ weather, timeFormat }: ForecastProps) {
   const [selectedDayIndex, setSelectedDayIndex] = useState<number | null>(null);
-  
-  const isDay = weather.current.is_day === 1;
 
-  // Hourly Forecast logic
-  const nowHour = new Date().toISOString().slice(0, 13);
+  // Hourly Forecast logic — hourly.time is the city's wall clock, so the
+  // cursor has to be the city's current hour, not the browser's or UTC's.
+  const nowHour = cityNow(weather.timezone).slice(0, 13);
   let startIdx = weather.hourly.time.findIndex(t => t.slice(0, 13) >= nowHour);
   if (startIdx < 0) startIdx = 0;
   
@@ -63,13 +49,13 @@ export function Forecast({ weather, timeFormat }: ForecastProps) {
       
       {/* 24-Hour Forecast */}
       <section className="forecast-card">
-        <div className="section-title">
+        <h2 className="section-title">
           <Clock size={16} />
           <span>24-Hour Forecast</span>
-        </div>
+        </h2>
         <div className="hourly-scroll">
           {hourlyData.map((h, idx) => {
-            const Icon = getWeatherIcon(h.code, isDay);
+            const Icon = getWeatherIcon(h.code, isDaylightAt(h.time, daily));
             return (
               <div key={idx} className={`hourly-item ${h.isNow ? 'now-item' : ''}`}>
                 <span className="hourly-time">{h.isNow ? 'Now' : formatHour(h.time, timeFormat)}</span>
@@ -88,10 +74,10 @@ export function Forecast({ weather, timeFormat }: ForecastProps) {
 
       {/* 7-Day Forecast */}
       <section className="forecast-card">
-        <div className="section-title">
+        <h2 className="section-title">
           <CalendarDays size={16} />
           <span>7-Day Forecast</span>
-        </div>
+        </h2>
         <div className="weekly-list">
           {weeklyData.map((d, idx) => {
             const info = getWMO(d.code);
@@ -103,9 +89,19 @@ export function Forecast({ weather, timeFormat }: ForecastProps) {
 
             return (
               <React.Fragment key={idx}>
-                <div 
-                  className={`weekly-item ${selectedDayIndex === idx ? 'expanded' : ''}`} 
+                <div
+                  className={`weekly-item ${selectedDayIndex === idx ? 'expanded' : ''}`}
                   onClick={() => setSelectedDayIndex(selectedDayIndex === idx ? null : idx)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedDayIndex(selectedDayIndex === idx ? null : idx);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={selectedDayIndex === idx}
+                  aria-label={`${d.isToday ? 'Today' : formatDay(d.time)}: ${info.label}, high ${Math.round(d.hi)} degrees, low ${Math.round(d.lo)} degrees. Show hourly detail.`}
                   style={{ cursor: 'pointer' }}
                 >
                   <span className="weekly-day">{d.isToday ? 'Today' : formatDay(d.time)}</span>
@@ -129,16 +125,20 @@ export function Forecast({ weather, timeFormat }: ForecastProps) {
                 {selectedDayIndex === idx && (
                   <div className="weekly-expanded-hourly animate-fade-up">
                     <div className="hourly-scroll" style={{ background: 'rgba(0,0,0,0.1)', borderRadius: '12px', padding: '12px' }}>
-                      {Array.from({ length: 24 }).map((_, hIdx) => {
-                        const globalIdx = idx * 24 + hIdx;
+                      {/* Match on the day itself rather than assuming a fixed
+                          24-hour stride into the hourly series. */}
+                      {weather.hourly.time.reduce<number[]>((acc, t, i) => {
+                        if (t.startsWith(d.time)) acc.push(i);
+                        return acc;
+                      }, []).map((globalIdx) => {
                         const hTime = weather.hourly.time[globalIdx];
                         const hCode = weather.hourly.weather_code[globalIdx];
                         const hTemp = weather.hourly.temperature_2m[globalIdx];
                         const hPop = weather.hourly.precipitation_probability ? weather.hourly.precipitation_probability[globalIdx] : 0;
-                        const HIcon = getWeatherIcon(hCode, true);
-                        
+                        const HIcon = getWeatherIcon(hCode, isDaylightAt(hTime, daily));
+
                         return (
-                          <div key={hIdx} className="hourly-item">
+                          <div key={hTime} className="hourly-item">
                             <span className="hourly-time">{formatHour(hTime, timeFormat)}</span>
                             <HIcon size={24} className="hourly-icon" strokeWidth={1.5} />
                             <span className="hourly-temp">{Math.round(hTemp)}°</span>

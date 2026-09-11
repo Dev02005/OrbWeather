@@ -21,18 +21,35 @@ OrbWeather is an elite, responsive, and data-rich weather dashboard application 
 
 ```
 OrbWeather/
+├── api/                # Serverless functions for push alerts (see below)
+│   └── _lib/           # Alert rules, storage, validation (+ tests)
 ├── src/
-│   ├── api/            # API integration files (weather.ts, geocoding.ts)
-│   ├── components/     # Reusable UI components (HeroCard, Forecast, Sidebar)
+│   ├── api/            # Open-Meteo + BigDataCloud clients (typed, abortable)
+│   ├── components/     # UI components (HeroCard, Forecast, Sidebar, ...)
 │   │   └── views/      # Full-page views (Settings, Faq, About, RadarMap)
-│   ├── utils/          # Helper functions and utilities (iconMap.ts)
-│   ├── App.tsx         # Main application component and routing logic
-│   ├── types.ts        # TypeScript interfaces for API responses and state
+│   ├── contexts/       # Toast provider and its hook
+│   ├── hooks/          # useRoute — History-API routing + document metadata
+│   ├── utils/          # time, forecast, storage, iconMap (+ colocated tests)
+│   ├── routes.ts       # Single route table, shared with the prerender step
+│   ├── App.tsx         # Dashboard shell and app state
+│   ├── main.tsx        # Entry point, error boundary, SW registration
+│   ├── types.ts        # API response and state interfaces
 │   └── index.css       # Global CSS variables and glassmorphism utilities
-├── public/             # Publicly accessible assets (favicon, manifest)
-├── REQUIREMENTS.md     # Detailed system and API requirements
-└── package.json        # Project dependencies and npm scripts
+├── scripts/
+│   └── prerender.mjs   # Emits per-route HTML + sitemap.xml after the build
+├── public/             # Icons, manifest, sw.js, robots.txt, social card
+└── package.json
 ```
+
+### Working with timezones
+
+Open-Meteo is queried with `timezone: 'auto'`, so every timestamp it returns is
+the *selected city's* wall clock and carries no UTC offset. Passing one of those
+strings to `new Date()` reads it in the **browser's** timezone, which silently
+skews results whenever the viewer isn't sitting in the city they're looking at.
+`src/utils/time.ts` holds the helpers for this — `cityNow`, `wallClockMs` and
+`formatWallClockTime`. Prefer them over `Date` parsing anywhere API timestamps
+are compared or displayed.
 
 ## Technology Stack
 
@@ -75,9 +92,133 @@ npm run build
 ```
 The minified and chunked files will be generated in the `dist` directory, ready for deployment to Vercel, Netlify, or any static hosting service.
 
+## Routing and SEO
+
+Routes live in one table (`src/routes.ts`) that is read twice: at runtime by
+`useRoute` (a small History-API router — the app has a handful of static routes
+and no dynamic segments, so it does not need a routing library), and at build
+time by `scripts/prerender.mjs`.
+
+That script writes a real HTML file per route with the correct `<title>`,
+description and canonical baked in, and regenerates `sitemap.xml` so it can
+never drift from the table. This matters because social crawlers — Facebook,
+LinkedIn, Slack — do not execute JavaScript: without prerendering every shared
+link previews as the homepage, no matter what the client-side code sets.
+
+Adding a route means adding one entry to `ROUTES`; the router, the metadata,
+the prerendered page and the sitemap all follow from it.
+
+## Testing
+
+```bash
+npm test          # single run
+npm run test:watch
+```
+
+Vitest covers the pure logic most likely to break subtly — timezone handling,
+forecast day/night derivation, `localStorage` validation and route matching.
+The timezone specs run assertions under several `TZ` values (including
+`America/Los_Angeles` and `Pacific/Kiritimati`), which is what pins down the
+class of bug where a date-only string parses as UTC midnight and shifts the
+weekday for every viewer west of UTC.
+
+## Progressive Web App
+
+OrbWeather registers a service worker in production builds (`public/sw.js`) and
+ships a full web app manifest, so it can be installed to a home screen and
+launched standalone. Caching is deliberately conservative:
+
+- **Navigations** — network-first, falling back to the cached app shell offline.
+- **Built assets** — cache-first; Vite fingerprints them so they never go stale.
+- **Weather APIs** — network-first, falling back to the last successful response,
+  so an offline launch shows the most recent readings rather than an error.
+
+Bump `CACHE_VERSION` in `public/sw.js` to retire every previous cache at once.
+
+## Weather Alerts (Web Push)
+
+OrbWeather can notify a device about incoming bad weather even while the app is
+closed. The browser cannot do this alone — something has to check the forecast
+while the phone sleeps — so a few small serverless functions live in `/api`:
+
+```
+Phone ──subscribe──► /api/subscribe ──► Upstash Redis (endpoint + city)
+cron-job.org ──every 15 min──► /api/check-weather
+    └─ reads subscriptions ─► Open-Meteo per place ─► alert rules ─► Web Push
+Browser push service (Google / Apple / Mozilla) ──► service worker ──► notification
+```
+
+**What triggers an alert** (`api/_lib/alerts.ts`): a thunderstorm, heavy rain or
+snow, or freezing rain now or within two hours; or a 70%+ chance of rain within
+two hours when it is currently dry. Each kind is sent at most once every six
+hours per device, and severe weather suppresses the separate rain alert.
+
+**Everything runs on free tiers.** Push delivery is free from the browser
+vendors; Vercel Hobby runs the functions; Upstash's free Redis stores
+subscriptions; cron-job.org provides the schedule (Vercel Hobby's own cron only
+runs daily). Each check fetches every watched place once, however many devices
+share it.
+
+### Setup
+
+1. **Keys.** Copy `.env.example` to `.env.local` and fill it in. Generate the
+   VAPID pair with `npx web-push generate-vapid-keys`, and use any long random
+   string for `CRON_SECRET`.
+2. **Database.** Create a free Redis database at [upstash.com](https://upstash.com)
+   and copy `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` from its
+   REST API section.
+3. **Vercel.** Add all five variables under *Project → Settings → Environment
+   Variables*, then redeploy — variables only apply to new deployments.
+4. **Schedule.** Create a job at [cron-job.org](https://cron-job.org) that calls
+   `https://<your-domain>/api/check-weather` every 15 minutes, with the header
+   `Authorization: Bearer <CRON_SECRET>`. (If a scheduler cannot set headers,
+   `?key=<CRON_SECRET>` works too.) Its run history shows each check's summary.
+
+On iPhone and iPad, Web Push only exists for sites added to the Home Screen
+(iOS 16.4+); the Settings screen detects this and shows the install steps.
+
+### Endpoints
+
+| Route | Purpose |
+|---|---|
+| `GET /api/push-key` | Public VAPID key the page subscribes with |
+| `POST /api/subscribe` | Create or refresh a device's subscription |
+| `POST /api/unsubscribe` | Delete it |
+| `POST /api/test-push` | Send a confirmation notification (rate-limited) |
+| `GET /api/check-weather` | The scheduled check; requires `CRON_SECRET` |
+
+Subscription endpoints are accepted only from known push-service hosts, so the
+server can never be pointed at an arbitrary URL. Total subscriptions are capped
+at 500 to stay inside free-tier limits.
+
+## Accessibility
+
+- City search is a full WAI-ARIA combobox: arrow keys move through results,
+  Enter selects the highlighted one, Escape dismisses the list.
+- A skip link, labelled landmarks and a single `h1` → `h2` heading outline make
+  the dashboard navigable by screen reader.
+- Every icon-only control carries an `aria-label`; decorative icons are hidden.
+- Toasts announce through a polite live region, with alerts raised to assertive.
+- One consistent `:focus-visible` ring, and `prefers-reduced-motion` is honoured.
+- A top-level error boundary keeps a render failure from blanking the page.
+
 ## Architecture and Design
 
-The application is built with a focus on maintainability and performance. State management is handled natively via React Context and Hooks, avoiding external library bloat. User preferences, themes, and saved cities are persistently stored in browser `localStorage`. The application relies entirely on open APIs and requires no API keys for setup or execution.
+State is handled natively with React hooks and one context, avoiding external
+library bloat. The app relies entirely on open APIs and needs no keys to run.
+
+A few conventions worth knowing before changing things:
+
+- **`localStorage` is never trusted.** It is user-writable and outlives app
+  versions, so `src/utils/storage.ts` validates every read and falls back rather
+  than casting. It also swallows access errors, which private-browsing modes
+  throw.
+- **Weather requests are abortable.** `loadWeather` cancels the previous request
+  before starting a new one, so a slow response for an earlier city can never
+  overwrite a newer one.
+- **Leaflet and tsparticles load lazily.** They are the two heaviest
+  dependencies and neither is needed for the first paint, which keeps the
+  initial bundle at roughly half what it would otherwise be.
 
 ## License
 

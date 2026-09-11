@@ -1,30 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Sunrise, Sunset } from 'lucide-react';
+import { cityNow, wallClockMs, formatWallClockTime } from '../utils/time';
 import './SunArc.css';
 
 interface SunArcProps {
   sunrise: string;
   sunset: string;
+  timezone: string;
   timeFormat: '12h' | '24h';
 }
 
-function formatTime(iso: string, format: '12h' | '24h') {
-  const d = new Date(iso);
-  if (format === '24h') {
-    return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-  }
-  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-}
-
-export function SunArc({ sunrise, sunset, timeFormat }: SunArcProps) {
+export function SunArc({ sunrise, sunset, timezone, timeFormat }: SunArcProps) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const updateProgress = () => {
-      const now = new Date().getTime();
-      const sr = new Date(sunrise).getTime();
-      const ss = new Date(sunset).getTime();
-      
+      // All three are the city's wall clock, so the zone offset they share
+      // cancels out and the ratio below is correct wherever the viewer is.
+      const now = wallClockMs(cityNow(timezone));
+      const sr = wallClockMs(sunrise);
+      const ss = wallClockMs(sunset);
+
       if (now < sr) setProgress(0);
       else if (now > ss) setProgress(100);
       else {
@@ -37,7 +33,7 @@ export function SunArc({ sunrise, sunset, timeFormat }: SunArcProps) {
     updateProgress();
     const interval = setInterval(updateProgress, 60000);
     return () => clearInterval(interval);
-  }, [sunrise, sunset]);
+  }, [sunrise, sunset, timezone]);
 
   // SVG Arc Math
   // Radius = 100, Center = (120, 110)
@@ -54,7 +50,7 @@ export function SunArc({ sunrise, sunset, timeFormat }: SunArcProps) {
   return (
     <section className="sun-arc-card animate-fade-up" style={{ animationDelay: '0.3s' }}>
       <div className="sac-header">
-        <h3>Daylight</h3>
+        <h2>Daylight</h2>
       </div>
       
       <div className="sac-visualizer">
@@ -88,13 +84,13 @@ export function SunArc({ sunrise, sunset, timeFormat }: SunArcProps) {
           <Sunrise size={20} className="sac-icon" />
           <div className="sac-time-col">
             <span className="sac-label">Sunrise</span>
-            <span className="sac-time">{formatTime(sunrise, timeFormat)}</span>
+            <span className="sac-time">{formatWallClockTime(sunrise, timeFormat)}</span>
           </div>
         </div>
         <div className="sac-time-block right">
           <div className="sac-time-col">
             <span className="sac-label">Sunset</span>
-            <span className="sac-time">{formatTime(sunset, timeFormat)}</span>
+            <span className="sac-time">{formatWallClockTime(sunset, timeFormat)}</span>
           </div>
           <Sunset size={20} className="sac-icon" />
         </div>

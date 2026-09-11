@@ -1,6 +1,7 @@
-import React from 'react';
-import { Moon, Sun, Thermometer, Clock, AlertTriangle } from 'lucide-react';
-import { useToast } from '../../contexts/ToastContext';
+import { Moon, Sun, Thermometer, Clock, Bell } from 'lucide-react';
+import { useToast } from '../../contexts/toast-context';
+import { WeatherAlerts } from '../WeatherAlerts';
+import type { CityMeta } from '../../types';
 import './Views.css';
 
 interface SettingsProps {
@@ -10,11 +11,10 @@ interface SettingsProps {
   setUnit: (u: 'celsius' | 'fahrenheit') => void;
   timeFormat: '12h' | '24h';
   setTimeFormat: (f: '12h' | '24h') => void;
-  notifications: boolean;
-  setNotifications: (n: boolean) => void;
+  currentCity: CityMeta | null;
 }
 
-export function Settings({ theme, setTheme, unit, setUnit, timeFormat, setTimeFormat, notifications, setNotifications }: SettingsProps) {
+export function Settings({ theme, setTheme, unit, setUnit, timeFormat, setTimeFormat, currentCity }: SettingsProps) {
   const { showToast } = useToast();
 
   const handleThemeChange = (newTheme: 'light' | 'dark') => {
@@ -30,15 +30,6 @@ export function Settings({ theme, setTheme, unit, setUnit, timeFormat, setTimeFo
   const handleTimeFormatChange = (newFormat: '12h' | '24h') => {
     setTimeFormat(newFormat);
     showToast('Time Format Updated', `Time format set to ${newFormat}.`, 'success');
-  };
-
-  const handleNotificationChange = (newVal: boolean) => {
-    setNotifications(newVal);
-    if (newVal) {
-      showToast('Notifications Enabled', 'You will now receive alerts for severe weather.', 'success');
-    } else {
-      showToast('Notifications Disabled', 'Severe weather alerts have been muted.', 'info');
-    }
   };
 
   return (
@@ -83,16 +74,10 @@ export function Settings({ theme, setTheme, unit, setUnit, timeFormat, setTimeFo
 
         <div className="settings-section">
           <div className="settings-section-header">
-            <AlertTriangle size={20} />
-            <h2>Notifications</h2>
+            <Bell size={20} />
+            <h2>Weather Alerts</h2>
           </div>
-          <div className="settings-options">
-            <button className={`setting-btn ${notifications ? 'active' : ''}`} onClick={() => handleNotificationChange(true)}>Enabled</button>
-            <button className={`setting-btn ${!notifications ? 'active' : ''}`} onClick={() => handleNotificationChange(false)}>Disabled</button>
-          </div>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '8px' }}>
-            Get an in-app alert instantly if severe weather (like thunderstorms or heavy snow) is detected in your active city.
-          </p>
+          <WeatherAlerts currentCity={currentCity} timeFormat={timeFormat} />
         </div>
 
       </div>
