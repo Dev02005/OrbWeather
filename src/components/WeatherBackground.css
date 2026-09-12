@@ -1,0 +1,79 @@
+/*
+ * Decorative weather layer. Sits above the page background but behind the
+ * cards, and animates only `transform` and `opacity` so the browser can run it
+ * on the compositor without touching layout.
+ */
+.weather-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.weather-bg-drop {
+  position: absolute;
+  top: 0;
+  display: block;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  will-change: transform;
+}
+
+/* ─── Rain ───────────────────────────────────────────────────────────────
+   Long, thin, slightly tilted streaks that fade in at the top, which is what
+   makes a falling line read as a raindrop rather than a dash. */
+.weather-bg-rain .weather-bg-drop {
+  width: 1.5px;
+  height: calc(22px * var(--drop-scale, 1));
+  border-radius: 1px;
+  background: linear-gradient(to bottom, rgba(147, 197, 253, 0), rgba(147, 197, 253, 0.95));
+  animation-name: weather-rain-fall;
+}
+
+@keyframes weather-rain-fall {
+  from { transform: translate3d(0, -15vh, 0) rotate(14deg); }
+  to   { transform: translate3d(-8vh, 115vh, 0) rotate(14deg); }
+}
+
+/* ─── Snow ─────────────────────────────────────────────────────────────── */
+.weather-bg-snow .weather-bg-drop {
+  width: calc(5px * var(--drop-scale, 1));
+  height: calc(5px * var(--drop-scale, 1));
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.7);
+  animation-name: weather-snow-fall;
+}
+
+@keyframes weather-snow-fall {
+  from { transform: translate3d(0, -10vh, 0); }
+  25%  { transform: translate3d(2.2vw, 20vh, 0); }
+  50%  { transform: translate3d(-1.8vw, 50vh, 0); }
+  75%  { transform: translate3d(2vw, 80vh, 0); }
+  to   { transform: translate3d(0, 110vh, 0); }
+}
+
+/* ─── Clear and cloudy: a few slow motes, barely there ──────────────────── */
+.weather-bg-calm .weather-bg-drop {
+  width: calc(3px * var(--drop-scale, 1));
+  height: calc(3px * var(--drop-scale, 1));
+  border-radius: 50%;
+  background: var(--text-muted);
+  animation-name: weather-calm-drift;
+}
+
+@keyframes weather-calm-drift {
+  from { transform: translate3d(0, 110vh, 0); }
+  to   { transform: translate3d(3vw, -10vh, 0); }
+}
+
+/* Rain and snow are brighter against the dark theme's deeper background. */
+.dark-theme .weather-bg-rain .weather-bg-drop {
+  background: linear-gradient(to bottom, rgba(186, 230, 253, 0), rgba(186, 230, 253, 1));
+}
+
+/* Motion is decorative only, so remove it entirely when it is unwelcome. */
+@media (prefers-reduced-motion: reduce) {
+  .weather-bg { display: none; }
+}

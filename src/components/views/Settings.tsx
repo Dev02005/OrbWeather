@@ -1,6 +1,7 @@
-import { Moon, Sun, Thermometer, Clock, Bell } from 'lucide-react';
+import { Moon, Sun, Thermometer, Clock, Bell, Download } from 'lucide-react';
 import { useToast } from '../../contexts/toast-context';
 import { WeatherAlerts } from '../WeatherAlerts';
+import { InstallApp } from '../InstallApp';
 import type { CityMeta } from '../../types';
 import './Views.css';
 
@@ -70,6 +71,14 @@ export function Settings({ theme, setTheme, unit, setUnit, timeFormat, setTimeFo
             <button className={`setting-btn ${timeFormat === '12h' ? 'active' : ''}`} onClick={() => handleTimeFormatChange('12h')}>12-Hour (AM/PM)</button>
             <button className={`setting-btn ${timeFormat === '24h' ? 'active' : ''}`} onClick={() => handleTimeFormatChange('24h')}>24-Hour</button>
           </div>
+        </div>
+
+        <div className="settings-section">
+          <div className="settings-section-header">
+            <Download size={20} />
+            <h2>Install App</h2>
+          </div>
+          <InstallApp />
         </div>
 
         <div className="settings-section">

@@ -4,7 +4,7 @@ import { fetchSuggestions } from '../services/geocoding';
 import { isAbortError } from '../services/weather';
 import { useState, useEffect, useRef } from 'react';
 import type { KeyboardEvent } from 'react';
-import { Search, MapPin, CloudRain, Check, Settings, HelpCircle, Info, Map, X } from 'lucide-react';
+import { Search, MapPin, Check, Settings, HelpCircle, Info, Map, X } from 'lucide-react';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -138,7 +138,6 @@ export function Sidebar({
             className="logo"
             onClick={() => { onNavigate('dashboard'); onClose(); }}
           >
-            <CloudRain className="logo-icon" size={28} aria-hidden="true" />
             <span className="logo-text">OrbWeather</span>
           </button>
         </div>

@@ -18,7 +18,6 @@ OrbWeather is built upon a modern React stack. The core libraries are defined in
 - **TypeScript (`~6.0.2`)**: Provides static typing across the entire application for improved developer experience and stability.
 - **Leaflet (`^1.9.4`) & React-Leaflet (`^5.0.0`)**: Used to render the interactive global radar map.
 - **Lucide React (`^1.23.0`)**: A comprehensive icon library used for UI iconography.
-- **tsparticles (`^3.0.0`)**: Used for the dynamic, weather-responsive background animations (snow, rain, stars).
 - **web-push (`^3.6.7`)**: Encrypts and signs weather alerts for the browser push services.
 - **@upstash/redis (`^1.38.4`)**: Stores push subscriptions for the alert server.
 - **Vitest (`^5.0.0`)**: Test runner for the unit and integration tests.

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
-import { Menu, Search, CloudRain, MapPin } from 'lucide-react';
+import { Menu, Search, MapPin } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
 import { HeroCard } from './components/HeroCard';
 import { StatsRow } from './components/StatsRow';
@@ -13,6 +13,7 @@ import { LandingPage } from './components/views/LandingPage';
 import { LocationPromptModal } from './components/LocationPromptModal';
 import { UvMoonCard } from './components/UvMoonCard';
 import { SunArc } from './components/SunArc';
+import { WeatherBackground } from './components/WeatherBackground';
 import { fetchWeather, isAbortError } from './services/weather';
 import { reverseGeocode } from './services/geocoding';
 import { useToast } from './contexts/toast-context';
@@ -23,13 +24,10 @@ import { syncAlerts } from './utils/push';
 import type { CityMeta, WeatherData, AirQualityData } from './types';
 import './App.css';
 
-// Leaflet and tsparticles are the two heaviest dependencies and neither is
-// needed for the first paint, so they load on demand instead of in the bundle.
+// Leaflet is the heaviest dependency and is not needed for the first paint,
+// so the map loads on demand rather than in the main bundle.
 const RadarMap = lazy(() =>
   import('./components/views/RadarMap').then(m => ({ default: m.RadarMap }))
-);
-const WeatherBackground = lazy(() =>
-  import('./components/WeatherBackground').then(m => ({ default: m.WeatherBackground }))
 );
 
 const THEMES = ['light', 'dark'] as const;
@@ -304,7 +302,6 @@ function App() {
             onClick={() => navigate('dashboard')}
             aria-label="OrbWeather home"
           >
-            <CloudRain size={20} aria-hidden="true" />
             <span>OrbWeather</span>
           </button>
           <button
@@ -317,11 +314,7 @@ function App() {
         </div>
 
         <div className="weather-dashboard">
-          {weather && (
-            <Suspense fallback={null}>
-              <WeatherBackground weatherCode={weather.current.weather_code} />
-            </Suspense>
-          )}
+          {weather && <WeatherBackground weatherCode={weather.current.weather_code} />}
 
           {showLocationPrompt && (
             <LocationPromptModal onAllow={handleLocationAllow} onDeny={handleLocationDeny} />

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { BeforeInstallPromptEvent } from '../../types';
+import { useInstallState, promptInstall } from '../../hooks/useInstallPrompt';
 import { CloudRain, Wind, Sun, ArrowRight, Download, X, Smartphone, Map } from 'lucide-react';
 import { InstallInstructions } from '../InstallInstructions';
 import './LandingPage.css';
@@ -10,36 +10,23 @@ interface LandingPageProps {
 
 export function LandingPage({ onStart }: LandingPageProps) {
   const [showDownloadPopup, setShowDownloadPopup] = useState(false);
-  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showSteps, setShowSteps] = useState(false);
+  const installState = useInstallState();
 
   useEffect(() => {
-    // Listen for PWA install prompt
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setInstallPrompt(e as BeforeInstallPromptEvent);
-    };
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    // Show popup automatically after 2.5 seconds
-    const timer = setTimeout(() => {
-      setShowDownloadPopup(true);
-    }, 2500);
-    
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
+    // Show the popup shortly after arrival, once the page has settled.
+    const timer = setTimeout(() => setShowDownloadPopup(true), 2500);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleDownload = async () => {
-    if (installPrompt) {
-      installPrompt.prompt();
-      const { outcome } = await installPrompt.userChoice;
-      if (outcome === 'accepted') {
-        setInstallPrompt(null);
+    if (installState === 'prompt') {
+      const outcome = await promptInstall();
+      if (outcome !== 'unavailable') {
+        setShowDownloadPopup(false);
+        return;
       }
-      setShowDownloadPopup(false);
+      setShowSteps(true);
     } else {
       // Safari, Firefox and iOS never fire beforeinstallprompt, so there is no
       // native prompt to show — walk the user through their browser's own menu.
@@ -93,7 +80,6 @@ export function LandingPage({ onStart }: LandingPageProps) {
       <div className="landing-content">
         <header className="landing-header">
           <div className="landing-logo">
-            <CloudRain className="logo-icon" size={32} />
             <h1>OrbWeather</h1>
           </div>
           <button className="header-download-btn" onClick={() => setShowDownloadPopup(true)}>

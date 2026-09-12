@@ -12,7 +12,6 @@ import {
   sendTestAlert,
 } from '../utils/push';
 import type { CityMeta } from '../types';
-import './WeatherAlerts.css';
 
 interface WeatherAlertsProps {
   currentCity: CityMeta | null;
@@ -91,7 +90,7 @@ export function WeatherAlerts({ currentCity, timeFormat }: WeatherAlertsProps) {
     });
 
   const summary = (
-    <p className="alerts-description">
+    <p className="settings-note">
       Get a notification when a thunderstorm, heavy rain or snow, or likely rain is heading your
       way — even when OrbWeather is closed. At most one of each kind every six hours.
     </p>
@@ -99,11 +98,11 @@ export function WeatherAlerts({ currentCity, timeFormat }: WeatherAlertsProps) {
 
   switch (status) {
     case 'checking':
-      return <p className="alerts-description" role="status">Checking notification status…</p>;
+      return <p className="settings-note" role="status">Checking notification status…</p>;
 
     case 'dev':
       return (
-        <p className="alerts-description">
+        <p className="settings-note">
           Weather alerts run in the deployed app — they need its service worker and server, which
           the development server does not provide.
         </p>
@@ -111,7 +110,7 @@ export function WeatherAlerts({ currentCity, timeFormat }: WeatherAlertsProps) {
 
     case 'unsupported':
       return (
-        <p className="alerts-description">
+        <p className="settings-note">
           This browser can’t receive notifications. Try Chrome, Edge or Firefox, or on iPhone,
           Safari with iOS 16.4 or later.
         </p>
@@ -119,8 +118,8 @@ export function WeatherAlerts({ currentCity, timeFormat }: WeatherAlertsProps) {
 
     case 'needs-install':
       return (
-        <div className="alerts-body">
-          <p className="alerts-description">
+        <div className="settings-stack">
+          <p className="settings-note">
             On iPhone and iPad, notifications only work once OrbWeather is on your Home Screen:
           </p>
           <InstallInstructions />
@@ -129,7 +128,7 @@ export function WeatherAlerts({ currentCity, timeFormat }: WeatherAlertsProps) {
 
     case 'blocked':
       return (
-        <p className="alerts-description">
+        <p className="settings-note">
           Notifications are blocked for OrbWeather. Allow them in your browser’s site settings — on
           iPhone, <strong>Settings → Notifications → OrbWeather</strong> — then reload this page.
         </p>
@@ -137,11 +136,11 @@ export function WeatherAlerts({ currentCity, timeFormat }: WeatherAlertsProps) {
 
     case 'off':
       return (
-        <div className="alerts-body">
+        <div className="settings-stack">
           {summary}
           <button
             type="button"
-            className="alerts-btn primary"
+            className="settings-btn primary"
             onClick={handleEnable}
             disabled={!currentCity || busy !== null}
           >
@@ -158,24 +157,24 @@ export function WeatherAlerts({ currentCity, timeFormat }: WeatherAlertsProps) {
     case 'on': {
       const canSwitch = currentCity && alertCity && !sameCity(currentCity, alertCity);
       return (
-        <div className="alerts-body">
-          <p className="alerts-status">
+        <div className="settings-stack">
+          <p className="settings-status">
             <Check size={16} aria-hidden="true" />
             Alerts are on for <strong>{alertCity?.name ?? 'your city'}</strong>
           </p>
           {summary}
-          <div className="alerts-actions">
-            <button type="button" className="alerts-btn primary" onClick={handleTest} disabled={busy !== null}>
+          <div className="settings-actions">
+            <button type="button" className="settings-btn primary" onClick={handleTest} disabled={busy !== null}>
               <Send size={16} aria-hidden="true" />
               {busy === 'test' ? 'Sending…' : 'Send test notification'}
             </button>
             {canSwitch && (
-              <button type="button" className="alerts-btn" onClick={handleEnable} disabled={busy !== null}>
+              <button type="button" className="settings-btn" onClick={handleEnable} disabled={busy !== null}>
                 <Bell size={16} aria-hidden="true" />
                 {busy === 'enable' ? 'Switching…' : `Switch to ${currentCity.name}`}
               </button>
             )}
-            <button type="button" className="alerts-btn" onClick={handleDisable} disabled={busy !== null}>
+            <button type="button" className="settings-btn" onClick={handleDisable} disabled={busy !== null}>
               <BellOff size={16} aria-hidden="true" />
               {busy === 'disable' ? 'Turning off…' : 'Turn off'}
             </button>

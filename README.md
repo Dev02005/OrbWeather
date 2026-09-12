@@ -15,7 +15,7 @@ OrbWeather is an elite, responsive, and data-rich weather dashboard application 
 - **Global Search & Geocoding**: Search for millions of cities globally with exact administrative region identification, automatic type-ahead debouncing, and responsive dropdown suggestions.
 - **Persistent Saved Locations**: Save your favorite cities into a quick-access grid within the sidebar that persists across sessions via local storage.
 - **Weather Alerts**: Opt-in push notifications on phones and computers — delivered even when the app is closed — for thunderstorms, heavy rain or snow, and rain arriving within two hours.
-- **Premium Aesthetics**: Engineered with a strict glassmorphism design language, dynamic particle backgrounds (using tsparticles) that reflect live weather conditions, and seamless light/dark mode transitions.
+- **Premium Aesthetics**: A strict glassmorphism design language, a CSS weather layer that rains, snows or drifts to match live conditions, and seamless light/dark mode transitions.
 
 ## Project Structure
 
@@ -224,9 +224,12 @@ A few conventions worth knowing before changing things:
 - **Weather requests are abortable.** `loadWeather` cancels the previous request
   before starting a new one, so a slow response for an earlier city can never
   overwrite a newer one.
-- **Leaflet and tsparticles load lazily.** They are the two heaviest
-  dependencies and neither is needed for the first paint, which keeps the
-  initial bundle at roughly half what it would otherwise be.
+- **Leaflet loads lazily.** The map is the heaviest dependency and is not
+  needed for the first paint, which keeps the initial bundle far smaller.
+- **The weather background is pure CSS.** Rain, snow and drifting motes are
+  animated with `transform` alone, so the browser runs them on the compositor.
+  It replaced a canvas particle library that cost ~145 kB of JavaScript, and it
+  disappears entirely under `prefers-reduced-motion`.
 
 ## License
 
