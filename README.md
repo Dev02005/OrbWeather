@@ -9,12 +9,12 @@ OrbWeather is an elite, responsive, and data-rich weather dashboard application 
 - **Real-Time Predictive Forecasts**: Access up-to-the-minute current weather conditions alongside a highly detailed 24-hour hourly curve (with temperature and precipitation tracking) and a comprehensive 7-day weekly outlook.
 - **Air Quality & Pollution Analysis**: View comprehensive breakdowns of localized air pollutants, including PM2.5, PM10, Nitrogen Dioxide (NO2), and Ozone (O3) concentration levels, sourced directly from Open-Meteo.
 - **Interactive Global Radar**: An integrated Leaflet map featuring custom marker physics and reverse geocoding capabilities. Simply click anywhere on the globe to instantly pull localized weather data and identify the administrative region.
-- **Custom Notification System**: A built-in, glassmorphic toast notification system that smoothly alerts you to severe weather warnings, settings changes, and saved locations without relying on clunky native browser popups.
+- **In-App Notifications**: A glassmorphic toast system confirms settings changes, saved locations and errors without native browser popups, and announces them to screen readers.
 - **Advanced Map Markers**: Interactive map markers that intelligently differentiate between your physical location (pulsing blue dot) and searched cities (custom glassmorphic pin).
 - **Responsive Fluid Layout**: Engineered with CSS Grid auto-fit and fluid typography (`clamp`) to look stunning on tiny mobile screens, iPads, and ultra-wide 4K displays alike.
 - **Global Search & Geocoding**: Search for millions of cities globally with exact administrative region identification, automatic type-ahead debouncing, and responsive dropdown suggestions.
 - **Persistent Saved Locations**: Save your favorite cities into a quick-access grid within the sidebar that persists across sessions via local storage.
-- **Alert System**: Opt-in to beautiful, glassmorphic in-app toast notifications for severe weather conditions (e.g., thunderstorms, snow) for your active city.
+- **Weather Alerts**: Opt-in push notifications on phones and computers — delivered even when the app is closed — for thunderstorms, heavy rain or snow, and rain arriving within two hours.
 - **Premium Aesthetics**: Engineered with a strict glassmorphism design language, dynamic particle backgrounds (using tsparticles) that reflect live weather conditions, and seamless light/dark mode transitions.
 
 ## Project Structure
@@ -24,7 +24,7 @@ OrbWeather/
 ├── api/                # Serverless functions for push alerts (see below)
 │   └── _lib/           # Alert rules, storage, validation (+ tests)
 ├── src/
-│   ├── api/            # Open-Meteo + BigDataCloud clients (typed, abortable)
+│   ├── services/       # Open-Meteo + BigDataCloud clients (typed, abortable)
 │   ├── components/     # UI components (HeroCard, Forecast, Sidebar, ...)
 │   │   └── views/      # Full-page views (Settings, Faq, About, RadarMap)
 │   ├── contexts/       # Toast provider and its hook
@@ -60,12 +60,14 @@ are compared or displayed.
 - **Iconography**: Lucide React
 - **Mapping Engine**: React-Leaflet
 - **Data Providers**: Open-Meteo API (Weather & AQI), BigDataCloud API (Reverse Geocoding)
+- **Alerts Backend**: Vercel Serverless Functions, Upstash Redis, Web Push (VAPID)
+- **Testing**: Vitest
 
 ## Installation & Setup
 
 ### Prerequisites
 
-Ensure you have Node.js (version 16 or higher) installed on your system.
+Ensure you have Node.js 20.19 or newer (22 LTS recommended) installed on your system.
 
 ### Development Environment
 
@@ -115,8 +117,14 @@ npm test          # single run
 npm run test:watch
 ```
 
-Vitest covers the pure logic most likely to break subtly — timezone handling,
-forecast day/night derivation, `localStorage` validation and route matching.
+Vitest covers the logic most likely to break subtly. On the client: timezone
+handling, forecast day/night derivation, `localStorage` validation, platform
+detection and route matching. On the alert server: the alert rules and their
+cooldowns, input validation, every endpoint, and a real Web Push round trip —
+a payload encrypted by the server is decrypted as a subscribed browser would.
+
+GitHub Actions (`.github/workflows/ci.yml`) runs the linter, the tests and a
+full build on every push and pull request.
 The timezone specs run assertions under several `TZ` values (including
 `America/Los_Angeles` and `Pacific/Kiritimati`), which is what pins down the
 class of bug where a date-only string parses as UTC midnight and shifts the

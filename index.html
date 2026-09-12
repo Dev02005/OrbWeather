@@ -28,6 +28,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="OrbWeather" />
 
+    <!-- Fonts load in parallel with the app rather than after the stylesheet. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+
     <!-- Warm up the data origins before the app asks for them. -->
     <link rel="preconnect" href="https://api.open-meteo.com" crossorigin />
     <link rel="preconnect" href="https://geocoding-api.open-meteo.com" crossorigin />
@@ -65,6 +70,7 @@
         "@type": "WebApplication",
         "name": "OrbWeather",
         "url": "https://orb-weather.vercel.app/",
+        "image": "https://orb-weather.vercel.app/og-image.png",
         "description": "Real-time weather dashboard with hourly and 7-day forecasts, air quality, UV index, astronomical data and an interactive world weather map.",
         "applicationCategory": "WeatherApplication",
         "operatingSystem": "Any",

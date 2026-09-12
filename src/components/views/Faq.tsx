@@ -39,7 +39,7 @@ export function Faq() {
         
         <FaqItem 
           question="Are my saved cities private?" 
-          answer="Absolutely. Your saved cities, application settings, and preferences are stored entirely locally on your own device using browser localStorage. We do not track, upload, or store your data on any external servers."
+          answer={<>Yes. Your saved cities, settings, and preferences are stored only on your own device, and we never track you. The single exception is weather alerts, which are off unless you turn them on: to reach your device while the app is closed, they store the city you chose and an anonymous notification address on our server. Turning alerts off deletes that record. See the <a href="/privacy">Privacy Policy</a> for details.</>}
         />
 
         <FaqItem 
@@ -53,8 +53,8 @@ export function Faq() {
         />
 
         <FaqItem 
-          question="What do the desktop notifications do?" 
-          answer="If you enable desktop notifications in the Settings menu, OrbWeather will automatically check for severe weather conditions (like thunderstorms, heavy hail, or snow) in your currently selected city, and push a native alert to your computer screen to keep you informed."
+          question="How do weather alerts work?"
+          answer={<>Turn them on in <strong>Settings → Weather Alerts</strong>. Every 15 minutes OrbWeather checks the forecast for your chosen city and sends a notification to your phone or computer — even when the app is closed — if a thunderstorm, heavy rain or snow, or rain is on its way within two hours. You get at most one alert of each kind every six hours. On iPhone and iPad, add OrbWeather to your Home Screen first; that is Apple’s requirement for web notifications.</>}
         />
 
       </div>

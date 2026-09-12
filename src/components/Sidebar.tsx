@@ -1,7 +1,7 @@
 import type { CityMeta } from '../types';
 import type { ViewId } from '../routes';
-import { fetchSuggestions } from '../api/geocoding';
-import { isAbortError } from '../api/weather';
+import { fetchSuggestions } from '../services/geocoding';
+import { isAbortError } from '../services/weather';
 import { useState, useEffect, useRef } from 'react';
 import type { KeyboardEvent } from 'react';
 import { Search, MapPin, CloudRain, Check, Settings, HelpCircle, Info, Map, X } from 'lucide-react';

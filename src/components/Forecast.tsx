@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Clock, CalendarDays, Droplets } from 'lucide-react';
 import type { WeatherData } from '../types';
-import { getWMO } from '../api/weather';
+import { getWMO } from '../services/weather';
 import { getWeatherIcon } from '../utils/iconMap';
 import { cityNow } from '../utils/time';
 import { formatDay, formatHour, isDaylightAt } from '../utils/forecast';
@@ -53,7 +53,8 @@ export function Forecast({ weather, timeFormat }: ForecastProps) {
           <Clock size={16} />
           <span>24-Hour Forecast</span>
         </h2>
-        <div className="hourly-scroll">
+        {/* Focusable so keyboard users can scroll it with the arrow keys. */}
+        <div className="hourly-scroll" tabIndex={0} role="region" aria-label="Hourly forecast for the next 24 hours">
           {hourlyData.map((h, idx) => {
             const Icon = getWeatherIcon(h.code, isDaylightAt(h.time, daily));
             return (
@@ -124,7 +125,13 @@ export function Forecast({ weather, timeFormat }: ForecastProps) {
                 {/* Expanded Hourly view for this day */}
                 {selectedDayIndex === idx && (
                   <div className="weekly-expanded-hourly animate-fade-up">
-                    <div className="hourly-scroll" style={{ background: 'rgba(0,0,0,0.1)', borderRadius: '12px', padding: '12px' }}>
+                    <div
+                      className="hourly-scroll"
+                      tabIndex={0}
+                      role="region"
+                      aria-label={`Hourly forecast for ${d.isToday ? 'today' : formatDay(d.time)}`}
+                      style={{ background: 'rgba(0,0,0,0.1)', borderRadius: '12px', padding: '12px' }}
+                    >
                       {/* Match on the day itself rather than assuming a fixed
                           24-hour stride into the hourly series. */}
                       {weather.hourly.time.reduce<number[]>((acc, t, i) => {

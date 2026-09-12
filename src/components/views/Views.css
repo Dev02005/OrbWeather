@@ -44,12 +44,6 @@
   font-size: 1.05rem;
 }
 
-.version-text {
-  margin-top: 16px;
-  font-size: 0.9rem;
-  color: var(--text-muted) !important;
-}
-
 /* Settings Styles */
 .settings-section {
   display: flex;

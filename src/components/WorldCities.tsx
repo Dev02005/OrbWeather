@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Globe2 } from 'lucide-react';
 import type { CityMeta, WeatherData } from '../types';
-import { fetchWeather, getWMO } from '../api/weather';
+import { fetchWeather, getWMO } from '../services/weather';
 import { getWeatherIcon } from '../utils/iconMap';
 import './WorldCities.css';
 

@@ -24,7 +24,7 @@ const getSnapshot = () => window.location.pathname;
 // snapshot is the route being rendered, which the build passes via the URL.
 const getServerSnapshot = () => '/';
 
-export function navigate(path: string) {
+function navigate(path: string) {
   if (window.location.pathname === path) return;
   window.history.pushState({}, '', path);
   listeners.forEach(fn => fn());

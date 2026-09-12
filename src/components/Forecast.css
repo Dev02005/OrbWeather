@@ -60,7 +60,7 @@
 .hourly-temp { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-mono); }
 .hourly-pop { 
   font-size: 0.75rem; 
-  color: var(--accent-blue); 
+  color: var(--accent-blue-text);
   display: flex; align-items: center; gap: 2px; font-weight: 600; 
 }
 

@@ -53,7 +53,7 @@ export async function fetchWeather(
 }
 
 // ─── WMO Weather Code → { label, bg } ────────────────────
-export const WMO: Record<number, { label: string; bg: string }> = {
+const WMO: Record<number, { label: string; bg: string }> = {
   0: { label: 'Clear Sky', bg: 'clear' },
   1: { label: 'Mainly Clear', bg: 'clear' },
   2: { label: 'Partly Cloudy', bg: 'clouds' },

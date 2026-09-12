@@ -84,7 +84,8 @@
 .weather-desc {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--accent-blue);
+  /* 1.1rem is below the large-text threshold, so it needs the darker token. */
+  color: var(--accent-blue-text);
   text-transform: capitalize;
 }
 
@@ -130,7 +131,7 @@
 @media (max-width: 768px) {
   /* The desktop min-height leaves a large dead band above the city name once
      the layout stacks, so let the card size to its content instead. */
-  .hero-card { min-height: 0; }
+  .hero-section { min-height: 0; }
   .hero-content {
     flex-direction: column-reverse;
     align-items: flex-start;

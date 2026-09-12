@@ -1,24 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 :root {
   --bg-primary: #f1f5f9;
   --bg-secondary: #ffffff;
   --bg-card: rgba(255, 255, 255, 0.85);
   --bg-card-hover: rgba(255, 255, 255, 1);
-  --glass: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(15, 23, 42, 0.06);
   --glass-border-hover: rgba(15, 23, 42, 0.12);
 
   --accent-violet: #6366f1;
   --accent-blue: #0ea5e9;
-  --accent-cyan: #06b6d4;
   --accent-emerald: #10b981;
   --accent-amber: #f59e0b;
   --accent-rose: #ef4444;
+  /* Darker shades for small text, where the brand colours above fall below
+     WCAG AA contrast. Icons and large text keep the brand colours. */
+  --accent-blue-text: #0369a1;
+  --accent-emerald-text: #047857;
 
   --text-primary: #0f172a;
   --text-secondary: #475569;
-  --text-muted: #64748b;
+  --text-muted: #5d6d83;
 
   --sidebar-width: 280px;
   --radius-sm: 10px;
@@ -52,7 +52,6 @@ a { color: var(--accent-blue); text-decoration: none; }
 a:hover { text-decoration: underline; }
 button { cursor: pointer; border: none; background: none; font-family: var(--font-primary); }
 input { font-family: var(--font-primary); }
-.hidden { display: none !important; }
 
 /* Visible only to screen readers, until focused (the skip link). */
 .visually-hidden {
@@ -125,12 +124,13 @@ input { font-family: var(--font-primary); }
   --bg-secondary: #1e293b;
   --bg-card: rgba(30, 41, 59, 0.85);
   --bg-card-hover: rgba(30, 41, 59, 1);
-  --glass: rgba(15, 23, 42, 0.7);
   --glass-border: rgba(255, 255, 255, 0.06);
   --glass-border-hover: rgba(255, 255, 255, 0.12);
   --text-primary: #f8fafc;
   --text-secondary: #cbd5e1;
-  --text-muted: #64748b;
+  --text-muted: #8492a6;
+  --accent-blue-text: #38bdf8;
+  --accent-emerald-text: #34d399;
   --shadow-glass: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.05);
   --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.2);
 }

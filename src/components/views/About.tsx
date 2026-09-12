@@ -15,7 +15,7 @@ export function About() {
           <li><strong>Interactive Global Map:</strong> Explore the globe and instantly pull weather data from any location by simply clicking on the map.</li>
           <li><strong>Air Quality Analysis:</strong> Deep tracking of localized air pollutants (PM2.5, PM10, Ozone, and Nitrogen Dioxide) to keep you safe.</li>
           <li><strong>Astronomical Data:</strong> Live tracking of the sun's position, daylight duration, exact UV indexes, and current moon phases.</li>
-          <li><strong>Smart Notifications:</strong> Opt-in desktop alerts that warn you of severe weather conditions in your active city.</li>
+          <li><strong>Weather Alerts:</strong> Opt-in notifications on your phone or computer — even when the app is closed — for storms, heavy rain or snow, and rain on its way.</li>
         </ul>
 
         <p>How does it work? OrbWeather continuously streams raw meteorological data from Open-Meteo's advanced weather models. When you search or use your current location, it utilizes reverse-geocoding technology to instantly map your precise GPS coordinates into accurate local forecasts.</p>

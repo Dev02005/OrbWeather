@@ -10,7 +10,7 @@ export interface Toast {
   exiting?: boolean;
 }
 
-export interface ToastContextType {
+interface ToastContextType {
   showToast: (title: string, message: string, type?: ToastType) => void;
 }
 

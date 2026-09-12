@@ -1,6 +1,6 @@
 import { MapPin } from 'lucide-react';
 import type { WeatherData, CityMeta } from '../types';
-import { getWMO } from '../api/weather';
+import { getWMO } from '../services/weather';
 import { getWeatherIcon } from '../utils/iconMap';
 import './HeroCard.css';
 
