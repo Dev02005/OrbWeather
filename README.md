@@ -2,20 +2,21 @@
 
 **Live Demo:** [https://orb-weather.vercel.app/](https://orb-weather.vercel.app/)
 
-OrbWeather is an elite, responsive, and data-rich weather dashboard application engineered with React, TypeScript, and Vite. It provides users with highly accurate, real-time meteorological data, air quality indices, astronomical positioning, and interactive global geocoding.
+OrbWeather is a responsive, installable weather dashboard built with React, TypeScript and Vite. It shows up-to-date forecasts, air quality, sun and moon data and an interactive world map for any city, and can send weather alerts to your phone — with no account, no advertising and no tracking.
 
 ## Core Features
 
-- **Real-Time Predictive Forecasts**: Access up-to-the-minute current weather conditions alongside a highly detailed 24-hour hourly curve (with temperature and precipitation tracking) and a comprehensive 7-day weekly outlook.
-- **Air Quality & Pollution Analysis**: View comprehensive breakdowns of localized air pollutants, including PM2.5, PM10, Nitrogen Dioxide (NO2), and Ozone (O3) concentration levels, sourced directly from Open-Meteo.
-- **Interactive Global Radar**: An integrated Leaflet map featuring custom marker physics and reverse geocoding capabilities. Simply click anywhere on the globe to instantly pull localized weather data and identify the administrative region.
-- **In-App Notifications**: A glassmorphic toast system confirms settings changes, saved locations and errors without native browser popups, and announces them to screen readers.
-- **Advanced Map Markers**: Interactive map markers that intelligently differentiate between your physical location (pulsing blue dot) and searched cities (custom glassmorphic pin).
-- **Responsive Fluid Layout**: Engineered with CSS Grid auto-fit and fluid typography (`clamp`) to look stunning on tiny mobile screens, iPads, and ultra-wide 4K displays alike.
-- **Global Search & Geocoding**: Search for millions of cities globally with exact administrative region identification, automatic type-ahead debouncing, and responsive dropdown suggestions.
-- **Persistent Saved Locations**: Save your favorite cities into a quick-access grid within the sidebar that persists across sessions via local storage.
+- **Forecasts**: Current conditions, a scrollable 24-hour strip with temperature and chance of rain for each hour, and a 7-day outlook where any day expands into its own hourly view. Day and night icons follow each hour's actual sunrise and sunset.
+- **Air Quality & Pollution Analysis**: The European Air Quality Index with a breakdown of PM2.5, PM10, carbon monoxide (CO), nitrogen dioxide (NO₂), ozone (O₃) and sulphur dioxide (SO₂), sourced from Open-Meteo.
+- **Interactive World Map**: A Leaflet map on OpenStreetMap tiles with reverse geocoding. Click anywhere on the globe to pull that spot's weather and identify its region. (It is a location picker, not a precipitation radar.)
+- **In-App Messages**: Glass-style toasts confirm settings changes, saved locations and errors without browser popups, and are announced to screen readers.
+- **Map Markers**: Your own location shows as a pulsing blue dot, and a searched or clicked city as a glass-style pin, so the two are never confused.
+- **Responsive Layout**: CSS Grid `auto-fit` and fluid `clamp()` sizing adapt the dashboard from small phones through tablets to wide desktop screens.
+- **Global Search**: Type-ahead city search worldwide, showing each result's region and country so places that share a name are easy to tell apart. Fully keyboard-operable.
+- **Saved Locations**: Save favourite cities to a list in the sidebar, remembered between visits in local storage, with their live conditions shown on the dashboard.
 - **Weather Alerts**: Opt-in push notifications on phones and computers — delivered even when the app is closed — for thunderstorms, heavy rain or snow, and rain arriving within two hours.
-- **Premium Aesthetics**: A strict glassmorphism design language, a CSS weather layer that rains, snows or drifts to match live conditions, and seamless light/dark mode transitions.
+- **Installable & Offline**: Install from the landing page or at any time from **Settings → Install App**. Installed or not, it opens offline with the most recent forecast it loaded.
+- **Design**: A glassmorphism look with light and dark themes, and a CSS weather layer that rains, snows or drifts to match live conditions — holding still for anyone who has reduced motion turned on.
 
 ## Project Structure
 
@@ -28,8 +29,8 @@ OrbWeather/
 │   ├── components/     # UI components (HeroCard, Forecast, Sidebar, ...)
 │   │   └── views/      # Full-page views (Settings, Faq, About, RadarMap)
 │   ├── contexts/       # Toast provider and its hook
-│   ├── hooks/          # useRoute — History-API routing + document metadata
-│   ├── utils/          # time, forecast, storage, iconMap (+ colocated tests)
+│   ├── hooks/          # useRoute (routing + metadata), useInstallPrompt (install flow)
+│   ├── utils/          # time, forecast, precipitation, storage, push, platform, iconMap (+ tests)
 │   ├── routes.ts       # Single route table, shared with the prerender step
 │   ├── App.tsx         # Dashboard shell and app state
 │   ├── main.tsx        # Entry point, error boundary, SW registration
@@ -143,6 +144,13 @@ launched standalone. Caching is deliberately conservative:
 
 Bump `CACHE_VERSION` in `public/sw.js` to retire every previous cache at once.
 
+Chromium fires its install event (`beforeinstallprompt`) once and early, so
+`src/hooks/useInstallPrompt.ts` captures it as soon as the app loads rather than
+inside a component. Both the landing-page popup and **Settings → Install App**
+read from it; Safari, Firefox and iOS, which have no install event, get
+step-by-step instructions instead, and a device already running installed sees
+a confirmation rather than a button.
+
 ## Weather Alerts (Web Push)
 
 OrbWeather can notify a device about incoming bad weather even while the app is
@@ -207,7 +215,10 @@ at 500 to stay inside free-tier limits.
   the dashboard navigable by screen reader.
 - Every icon-only control carries an `aria-label`; decorative icons are hidden.
 - Toasts announce through a polite live region, with alerts raised to assertive.
-- One consistent `:focus-visible` ring, and `prefers-reduced-motion` is honoured.
+- One consistent `:focus-visible` ring. Under `prefers-reduced-motion`, animations
+  are cut short and the weather background holds still instead of moving.
+- FAQ questions are real buttons inside headings, so they open from the keyboard
+  and announce whether they are expanded.
 - A top-level error boundary keeps a render failure from blanking the page.
 
 ## Architecture and Design
@@ -228,8 +239,11 @@ A few conventions worth knowing before changing things:
   needed for the first paint, which keeps the initial bundle far smaller.
 - **The weather background is pure CSS.** Rain, snow and drifting motes are
   animated with `transform` alone, so the browser runs them on the compositor.
-  It replaced a canvas particle library that cost ~145 kB of JavaScript, and it
-  disappears entirely under `prefers-reduced-motion`.
+  It replaced a canvas particle library that cost ~145 kB of JavaScript. Under
+  `prefers-reduced-motion` each drop rests at its own height, so the weather is
+  still shown without anything moving.
+- **Content pages use CSS classes, not inline styles.** About, FAQ and the policy
+  pages share `Views.css` and `Standalone.css`, so both themes apply to them.
 
 ## License
 

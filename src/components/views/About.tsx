@@ -7,36 +7,47 @@ export function About() {
         <h1>About OrbWeather</h1>
       </div>
       <div className="view-content">
-        <p><strong>OrbWeather</strong> is a premium, data-rich weather dashboard engineered by Praneeth Karri. It is built to give you the most accurate and beautiful weather forecasts at a single glance, without any unnecessary clutter.</p>
-        
-        <h3 style={{ marginTop: '24px', marginBottom: '12px', color: 'var(--text-primary)' }}>Key Features</h3>
-        <ul style={{ color: 'var(--text-secondary)', lineHeight: '1.8', marginLeft: '20px', marginBottom: '24px' }}>
-          <li><strong>Real-Time Predictive Forecasts:</strong> A highly detailed 24-hour curve and a 7-day outlook to plan your week perfectly.</li>
-          <li><strong>Interactive Global Map:</strong> Explore the globe and instantly pull weather data from any location by simply clicking on the map.</li>
-          <li><strong>Air Quality Analysis:</strong> Deep tracking of localized air pollutants (PM2.5, PM10, Ozone, and Nitrogen Dioxide) to keep you safe.</li>
-          <li><strong>Astronomical Data:</strong> Live tracking of the sun's position, daylight duration, exact UV indexes, and current moon phases.</li>
-          <li><strong>Weather Alerts:</strong> Opt-in notifications on your phone or computer — even when the app is closed — for storms, heavy rain or snow, and rain on its way.</li>
+        <p>
+          <strong>OrbWeather</strong> is a free weather dashboard created by Praneeth Karri. It
+          brings current conditions, forecasts, air quality and sun and moon data for any city into
+          one clear screen — with no account, no advertising and no tracking.
+        </p>
+
+        <h2 className="about-heading">Key Features</h2>
+        <ul className="about-features">
+          <li><strong>Forecasts:</strong> current conditions, a 24-hour hourly strip and a 7-day outlook you can expand hour by hour.</li>
+          <li><strong>Interactive map:</strong> click anywhere in the world to see the weather at that exact spot.</li>
+          <li><strong>Air quality:</strong> the European Air Quality Index with PM2.5, PM10, ozone, nitrogen dioxide, sulphur dioxide and carbon monoxide.</li>
+          <li><strong>Sun and moon:</strong> sunrise and sunset, a live daylight arc, the UV index and the moon phase.</li>
+          <li><strong>Search and saved cities:</strong> find any place worldwide and keep your favourites one tap away.</li>
+          <li><strong>Weather alerts:</strong> optional notifications on your phone or computer — even when the app is closed — for storms, heavy rain or snow, and rain on its way.</li>
+          <li><strong>Install and offline:</strong> add OrbWeather to your home screen from Settings, and it opens like an app with your latest forecast even without a connection.</li>
         </ul>
 
-        <p>How does it work? OrbWeather continuously streams raw meteorological data from Open-Meteo's advanced weather models. When you search or use your current location, it utilizes reverse-geocoding technology to instantly map your precise GPS coordinates into accurate local forecasts.</p>
-        
-        <div style={{ padding: '16px', background: 'rgba(239, 68, 68, 0.1)', borderLeft: '4px solid #ef4444', borderRadius: '8px', margin: '32px 0 0 0' }}>
-          <strong>Caution:</strong> The weather forecasts, air quality indices, and other meteorological data provided by this application are model-based predictions. While we strive for accuracy using advanced models, these are not absolute certainties and should not be used as the sole source of information for critical decisions or safety planning.
+        <h2 className="about-heading">Where the Data Comes From</h2>
+        <p>
+          Forecasts, air quality and city search come from{' '}
+          <a href="https://open-meteo.com" target="_blank" rel="noopener noreferrer">Open-Meteo</a>,
+          which combines leading national weather models. When you use your current location,{' '}
+          <a href="https://www.bigdatacloud.com" target="_blank" rel="noopener noreferrer">BigDataCloud</a>{' '}
+          turns your coordinates into a city name, and the map is drawn with{' '}
+          <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>{' '}
+          data.
+        </p>
+
+        <div className="notice">
+          <strong>Caution:</strong> forecasts, air quality readings and alerts are model-based
+          predictions, not certainties. Do not rely on OrbWeather alone for decisions about safety
+          — always follow your local weather authority’s official warnings.
         </div>
 
-        <hr style={{ border: 'none', borderTop: '1px solid var(--glass-border)', margin: '40px 0' }} />
+        <hr className="about-divider" />
 
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
-          <a href="/privacy" className="setting-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
-            Privacy Policy
-          </a>
-          <a href="/terms" className="setting-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
-            Terms of Usage
-          </a>
-          <a href="/contact" className="setting-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
-            Contact Us
-          </a>
-        </div>
+        <nav className="about-links" aria-label="Legal and contact">
+          <a href="/privacy" className="setting-btn">Privacy Policy</a>
+          <a href="/terms" className="setting-btn">Terms of Usage</a>
+          <a href="/contact" className="setting-btn">Contact Us</a>
+        </nav>
       </div>
     </div>
   );

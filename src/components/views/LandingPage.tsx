@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useInstallState, promptInstall } from '../../hooks/useInstallPrompt';
-import { CloudRain, Wind, Sun, ArrowRight, Download, X, Smartphone, Map } from 'lucide-react';
+import { CloudRain, Wind, Sun, ArrowRight, Download, X, Smartphone, Map, Search, Bell } from 'lucide-react';
 import { InstallInstructions } from '../InstallInstructions';
 import './LandingPage.css';
 
@@ -115,9 +115,9 @@ export function LandingPage({ onStart }: LandingPageProps) {
 
           <div className="hero-features" style={{ animationDelay: '0.2s' }}>
             <div className="feature-card">
-              <Sun size={28} className="feature-icon text-yellow" />
-              <h3>Real-time Radar</h3>
-              <p>Track storms and precipitation with interactive maps.</p>
+              <Map size={28} className="feature-icon text-yellow" />
+              <h3>Interactive Map</h3>
+              <p>Click anywhere in the world to see its weather.</p>
             </div>
             <div className="feature-card">
               <Wind size={28} className="feature-icon text-blue" />
@@ -130,14 +130,14 @@ export function LandingPage({ onStart }: LandingPageProps) {
               <p>Plan ahead with accurate, hyper-local predictions.</p>
             </div>
             <div className="feature-card">
-              <Map size={28} className="feature-icon text-yellow" />
+              <Search size={28} className="feature-icon text-yellow" />
               <h3>Global Search</h3>
               <p>Find weather for millions of cities globally instantly.</p>
             </div>
             <div className="feature-card">
-              <CloudRain size={28} className="feature-icon text-blue" />
-              <h3>Severe Alerts</h3>
-              <p>Get instant notifications for severe weather conditions.</p>
+              <Bell size={28} className="feature-icon text-blue" />
+              <h3>Weather Alerts</h3>
+              <p>Get notified about storms and rain, even when the app is closed.</p>
             </div>
             <div className="feature-card">
               <Sun size={28} className="feature-icon text-purple" />
@@ -150,7 +150,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
         <footer className="landing-footer">
           <div className="footer-links">
             <a href="/privacy">Privacy Policy</a>
-            <a href="/terms">Terms of Service</a>
+            <a href="/terms">Terms of Usage</a>
             <a href="/contact">Contact Us</a>
           </div>
           <div className="footer-copyright">

@@ -9,6 +9,8 @@ interface WeatherBackgroundProps {
 /** Per-drop variation, fixed once so the animation never re-randomises on render. */
 interface Drop {
   left: number;
+  /** Resting height, used when the device asks for reduced motion. */
+  top: number;
   duration: number;
   delay: number;
   scale: number;
@@ -20,6 +22,7 @@ const COUNTS = { rain: 70, snow: 60, calm: 24 } as const;
 function makeDrops(count: number, minDuration: number, maxDuration: number): Drop[] {
   return Array.from({ length: count }, () => ({
     left: Math.random() * 100,
+    top: Math.random() * 100,
     duration: minDuration + Math.random() * (maxDuration - minDuration),
     // A negative delay starts each drop mid-fall, so the screen is never empty.
     delay: -Math.random() * maxDuration,
@@ -32,8 +35,8 @@ function makeDrops(count: number, minDuration: number, maxDuration: number): Dro
  * A decorative layer behind the dashboard that reflects the current conditions.
  *
  * Drawn with CSS transforms rather than a canvas library: it costs no JavaScript
- * at runtime, the browser animates it on the compositor, and it stops entirely
- * for anyone who prefers reduced motion.
+ * at runtime, the browser animates it on the compositor, and for anyone who
+ * prefers reduced motion it holds still rather than disappearing.
  */
 export function WeatherBackground({ weatherCode }: WeatherBackgroundProps) {
   const kind = precipitationKind(weatherCode);
@@ -56,6 +59,7 @@ export function WeatherBackground({ weatherCode }: WeatherBackgroundProps) {
             animationDelay: `${drop.delay}s`,
             opacity: drop.opacity,
             ['--drop-scale' as string]: drop.scale,
+            ['--drop-top' as string]: `${drop.top}%`,
           }}
         />
       ))}

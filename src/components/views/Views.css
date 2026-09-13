@@ -26,16 +26,89 @@
   gap: 24px;
 }
 
-/* FAQ & About Styles */
-.faq-item h3 {
-  font-size: 1.1rem;
-  color: var(--text-primary);
-  margin-bottom: 8px;
+/* ─── FAQ ──────────────────────────────────────────────────────────────── */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.faq-item p {
+.faq-item {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+}
+
+.faq-question {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+/* The whole question row is one real button, so it works from the keyboard. */
+.faq-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 16px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.faq-toggle svg {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.faq-item.open .faq-toggle svg { transform: rotate(180deg); }
+
+.faq-answer {
+  padding: 0 16px 16px;
   color: var(--text-secondary);
   line-height: 1.6;
+}
+
+.faq-answer ul {
+  margin: 8px 0 0 20px;
+  line-height: 1.8;
+}
+
+/* ─── About ────────────────────────────────────────────────────────────── */
+.about-heading {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.about-features {
+  margin-left: 20px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.about-divider {
+  border: none;
+  border-top: 1px solid var(--glass-border);
+}
+
+.about-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.about-links a {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
 }
 
 .view-content p {

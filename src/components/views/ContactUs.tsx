@@ -6,21 +6,29 @@ export function ContactUs() {
     <div className="standalone-container">
       <h1 className="standalone-title">Contact Us</h1>
       <div className="standalone-content">
-        <p>Have questions, feedback, or need support? We'd love to hear from you. Reach out to us through any of the channels below.</p>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '32px' }}>
-          
+        <p>
+          Have a question, an idea, or found something that is not working? We would love to hear
+          from you.
+        </p>
+
+        <div className="contact-list">
           <div className="contact-card">
             <div className="contact-icon">
-              <Mail size={24} />
+              <Mail size={24} aria-hidden="true" />
             </div>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-primary)' }}>Email Support</h3>
-              <a href="mailto:orbwheather@gmail.com" style={{ display: 'inline-block', margin: '4px 0 0 0', color: 'var(--accent-blue)', textDecoration: 'none', fontWeight: 500 }}>orbwheather@gmail.com</a>
+              <h2 className="contact-title">Email Support</h2>
+              <a className="contact-link" href="mailto:orbwheather@gmail.com">
+                orbwheather@gmail.com
+              </a>
             </div>
           </div>
-
         </div>
+
+        <p className="contact-footnote">
+          Reporting a problem? Mention the city you were viewing, your device and your browser — it
+          helps us track the issue down quickly.
+        </p>
       </div>
     </div>
   );

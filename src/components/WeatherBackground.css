@@ -73,7 +73,17 @@
   background: linear-gradient(to bottom, rgba(186, 230, 253, 0), rgba(186, 230, 253, 1));
 }
 
-/* Motion is decorative only, so remove it entirely when it is unwelcome. */
+/*
+ * Reduced motion: keep showing the weather, but still. Each drop rests at its
+ * own height instead of falling. `animation: none` must beat the global
+ * reduced-motion rule in index.css, which otherwise plays every animation
+ * instantly and leaves all the drops piled along the top edge.
+ */
 @media (prefers-reduced-motion: reduce) {
-  .weather-bg { display: none; }
+  .weather-bg-drop {
+    top: var(--drop-top, 0);
+    animation: none !important;
+  }
+
+  .weather-bg-rain .weather-bg-drop { transform: rotate(14deg); }
 }

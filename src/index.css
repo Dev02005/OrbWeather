@@ -53,6 +53,17 @@ a:hover { text-decoration: underline; }
 button { cursor: pointer; border: none; background: none; font-family: var(--font-primary); }
 input { font-family: var(--font-primary); }
 
+/* A red-edged caution box used on the About and Terms pages. */
+.notice {
+  margin: 8px 0;
+  padding: 16px;
+  border-left: 4px solid var(--accent-rose);
+  border-radius: var(--radius-sm);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
 /* Visible only to screen readers, until focused (the skip link). */
 .visually-hidden {
   position: absolute;

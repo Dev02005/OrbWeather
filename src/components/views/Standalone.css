@@ -23,7 +23,7 @@
   color: var(--text-secondary);
 }
 
-.standalone-content h3 {
+.standalone-content h2 {
   margin-top: 32px;
   margin-bottom: 16px;
   color: var(--text-primary);
@@ -59,6 +59,27 @@
   transform: translateY(-2px);
   box-shadow: var(--shadow-card);
 }
+
+.standalone-updated {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.contact-list { display: flex; flex-direction: column; gap: 24px; margin-top: 32px; }
+
+.standalone-content .contact-title { margin: 0; font-size: 1.2rem; color: var(--text-primary); }
+
+.contact-link {
+  display: inline-block;
+  margin-top: 4px;
+  font-weight: 500;
+  color: var(--accent-blue-text);
+  text-decoration: none;
+}
+
+.contact-link:hover { text-decoration: underline; }
+
+.contact-footnote { margin-top: 24px; }
 
 .contact-icon {
   background: var(--accent-blue);
