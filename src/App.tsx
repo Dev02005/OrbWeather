@@ -21,6 +21,7 @@ import { useRoute, applyRouteMeta } from './hooks/useRoute';
 import { STORAGE_KEYS, readEnum, readBoolean, readCity, readCityList, write } from './utils/storage';
 import { isStandalone } from './utils/platform';
 import { syncAlerts } from './utils/push';
+import { getPosition, locationFailureMessage, approximateDistance } from './utils/location';
 import type { CityMeta, WeatherData, AirQualityData } from './types';
 import './App.css';
 
@@ -34,17 +35,8 @@ const THEMES = ['light', 'dark'] as const;
 const UNITS = ['celsius', 'fahrenheit'] as const;
 const TIME_FORMATS = ['12h', '24h'] as const;
 
-const FALLBACK_CITY: CityMeta = {
-  name: 'London',
-  countryCode: 'GB',
-  country: 'United Kingdom',
-  lat: 51.5074,
-  lon: -0.1278,
-};
-
 /** How often an open, visible dashboard refreshes its data. */
 const REFRESH_INTERVAL_MS = 15 * 60 * 1000;
-const GEO_OPTIONS: PositionOptions = { timeout: 10_000, enableHighAccuracy: true };
 
 function App() {
   const { route, navigate } = useRoute();
@@ -177,58 +169,61 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /** Resolves to the detected city, or null if permission or lookup failed. */
-  const detectLocation = useCallback(
-    () =>
-      new Promise<CityMeta | null>(resolve => {
-        if (!('geolocation' in navigator)) {
-          resolve(null);
-          return;
-        }
-        navigator.geolocation.getCurrentPosition(
-          async position => {
-            const city = await reverseGeocode(
-              position.coords.latitude,
-              position.coords.longitude
-            );
-            if (city) {
-              setCurrentCity(city);
-              await loadWeather(city, unit);
-            }
-            resolve(city);
-          },
-          geoError => {
-            console.warn('Geolocation failed or denied:', geoError);
-            resolve(null);
-          },
-          GEO_OPTIONS
-        );
-      }),
-    [loadWeather, unit]
-  );
+  /** Finds the device, loads its weather, and reports how it went. */
+  const detectLocation = useCallback(async (): Promise<
+    { city: CityMeta; accuracy: number } | { error: string }
+  > => {
+    const position = await getPosition();
+    if (!position.ok) return { error: locationFailureMessage(position.reason) };
+
+    const city = await reverseGeocode(position.lat, position.lon);
+    if (!city) return { error: locationFailureMessage('lookup') };
+
+    setCurrentCity(city);
+    await loadWeather(city, unit);
+    return { city, accuracy: position.accuracy };
+  }, [loadWeather, unit]);
+
+  /**
+   * Computers without GPS often only know their position to within tens of
+   * kilometres, which can land in the wrong city. Say so rather than presenting
+   * a guess with the same confidence as a real fix.
+   */
+  const announceLocation = useCallback((city: CityMeta, accuracy: number) => {
+    const distance = approximateDistance(accuracy);
+    if (distance) {
+      showToast(
+        'Approximate Location',
+        `Showing ${city.name}, but your device only knows where you are to within ${distance}. If that’s not your city, search for it.`,
+        'info'
+      );
+    } else {
+      showToast('Location Found', `Showing weather for ${city.name}.`, 'success');
+    }
+  }, [showToast]);
 
   const handleCurrentLocation = async () => {
-    const city = await detectLocation();
+    const result = await detectLocation();
     navigate('dashboard');
-    if (city) {
-      showToast('Location Found', `Successfully localized to ${city.name}`, 'success');
-    } else {
-      showToast(
-        'Location Error',
-        'Could not detect your location. Please check browser permissions.',
-        'error'
-      );
+    if ('error' in result) {
+      showToast('Location Unavailable', result.error, 'error');
+      return;
     }
+    announceLocation(result.city, result.accuracy);
   };
 
   const handleLocationAllow = async () => {
     setShowLocationPrompt(false);
     setLoading(true);
-    const city = await detectLocation();
-    if (!city) {
-      setCurrentCity(FALLBACK_CITY);
-      loadWeather(FALLBACK_CITY, unit);
+    const result = await detectLocation();
+    if ('error' in result) {
+      // Leave the dashboard on its "choose a city" state and open search.
+      setLoading(false);
+      setSidebarOpen(true);
+      showToast('Location Unavailable', result.error, 'error');
+      return;
     }
+    announceLocation(result.city, result.accuracy);
   };
 
   const handleLocationDeny = () => {
