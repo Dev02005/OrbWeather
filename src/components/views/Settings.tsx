@@ -1,10 +1,8 @@
 import type { ReactNode } from 'react';
-import { Moon, Sun, Thermometer, Clock, Sparkles, Bell, Download } from 'lucide-react';
+import { Moon, Sun, Thermometer, Clock, Bell, Download } from 'lucide-react';
 import { useToast } from '../../contexts/toast-context';
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { WeatherAlerts } from '../WeatherAlerts';
 import { InstallApp } from '../InstallApp';
-import type { BackgroundMotion } from '../../utils/motion';
 import type { CityMeta } from '../../types';
 import './Views.css';
 
@@ -19,8 +17,6 @@ interface SettingsProps {
   setUnit: (unit: Unit) => void;
   timeFormat: TimeFormat;
   setTimeFormat: (format: TimeFormat) => void;
-  backgroundMotion: BackgroundMotion;
-  setBackgroundMotion: (motion: BackgroundMotion) => void;
   currentCity: CityMeta | null;
 }
 
@@ -82,18 +78,6 @@ const TIME_FORMAT_OPTIONS = [
   { value: '24h', label: '24-Hour' },
 ] as const;
 
-const MOTION_OPTIONS = [
-  { value: 'system', label: 'Follow device' },
-  { value: 'on', label: 'Always on' },
-  { value: 'off', label: 'Off' },
-] as const;
-
-const MOTION_CONFIRMATION: Record<BackgroundMotion, string> = {
-  system: 'The background now follows your device’s motion setting.',
-  on: 'The background will always animate.',
-  off: 'The weather background is turned off.',
-};
-
 export function Settings({
   theme,
   setTheme,
@@ -101,21 +85,9 @@ export function Settings({
   setUnit,
   timeFormat,
   setTimeFormat,
-  backgroundMotion,
-  setBackgroundMotion,
   currentCity,
 }: SettingsProps) {
   const { showToast } = useToast();
-  const prefersReducedMotion = usePrefersReducedMotion();
-
-  const motionNote =
-    backgroundMotion === 'on'
-      ? 'Rain, snow and drifting motes animate even if your device asks for reduced motion.'
-      : backgroundMotion === 'off'
-        ? 'The weather background is hidden.'
-        : prefersReducedMotion
-          ? 'Your device is set to reduce motion, so the background is shown still. Choose “Always on” to animate it anyway.'
-          : 'The background animates, and will hold still if you turn on reduced motion on your device.';
 
   return (
     <div className="view-container animate-fade-up">
@@ -161,21 +133,6 @@ export function Settings({
               showToast('Time Format Updated', `Time format set to ${next}.`, 'success');
             }}
           />
-        </SettingsSection>
-
-        <SettingsSection icon={<Sparkles size={20} />} title="Background Animation">
-          <div className="settings-stack">
-            <OptionGroup
-              label="Background animation"
-              value={backgroundMotion}
-              options={MOTION_OPTIONS}
-              onChange={next => {
-                setBackgroundMotion(next);
-                showToast('Background Updated', MOTION_CONFIRMATION[next], 'success');
-              }}
-            />
-            <p className="settings-note">{motionNote}</p>
-          </div>
         </SettingsSection>
 
         <SettingsSection icon={<Download size={20} />} title="Install App">

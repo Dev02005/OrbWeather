@@ -10,7 +10,6 @@ export const STORAGE_KEYS = {
   theme: 'orbweather_theme',
   unit: 'orbweather_unit',
   timeFormat: 'orbweather_timeformat',
-  backgroundMotion: 'orbweather_background_motion',
   /** The city this device's push alerts are for; present only while alerts are on. */
   alertsCity: 'orbweather_alerts_city',
   saved: 'orbweather_saved',

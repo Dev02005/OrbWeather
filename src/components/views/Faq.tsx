@@ -89,19 +89,6 @@ export function Faq() {
             service.
           </FaqItem>
 
-          <FaqItem question="Why isn’t the rain or snow in the background moving?">
-            By default OrbWeather follows your device’s <em>reduce motion</em> setting. When that is
-            on, the background still shows the weather but holds still. To make it move anyway, open{' '}
-            <strong>Settings → Background Animation</strong> and choose <strong>Always on</strong>.
-            Alternatively, turn animations back on for your whole device:
-            <ul>
-              <li><strong>Windows:</strong> Settings → Accessibility → Visual effects → Animation effects (on)</li>
-              <li><strong>Mac:</strong> System Settings → Accessibility → Display → Reduce motion (off)</li>
-              <li><strong>iPhone and iPad:</strong> Settings → Accessibility → Motion → Reduce Motion (off)</li>
-              <li><strong>Android:</strong> Settings → Accessibility → Remove animations (off)</li>
-            </ul>
-          </FaqItem>
-
           <FaqItem question="Are my saved cities private?">
             Yes. Your saved cities, settings and preferences are stored only on your own device, and
             we never track you. The single exception is weather alerts, which are off unless you

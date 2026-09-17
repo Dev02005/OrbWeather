@@ -72,15 +72,3 @@
 .dark-theme .weather-bg-rain .weather-bg-drop {
   background: linear-gradient(to bottom, rgba(186, 230, 253, 0), rgba(186, 230, 253, 1));
 }
-
-/*
- * Still mode: shown when the device asks for reduced motion and the user has
- * not switched the animation on. Each drop rests at its own height instead of
- * falling. The component applies this class, so the setting can override it.
- */
-.weather-bg-still .weather-bg-drop {
-  top: var(--drop-top, 0);
-  animation: none;
-}
-
-.weather-bg-still.weather-bg-rain .weather-bg-drop { transform: rotate(14deg); }

@@ -4,12 +4,7 @@
   "version": "1.0.0",
   "description": "Real-time weather dashboard with forecasts, air quality, an interactive map and push weather alerts.",
   "license": "MIT",
-  "author": "Praneeth Karri",
   "homepage": "https://orb-weather.vercel.app",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Dev02005/OrbWeather.git"
-  },
   "type": "module",
   "engines": {
     "node": ">=20.19"

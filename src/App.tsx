@@ -21,7 +21,6 @@ import { useRoute, applyRouteMeta } from './hooks/useRoute';
 import { STORAGE_KEYS, readEnum, readBoolean, readCity, readCityList, write } from './utils/storage';
 import { isStandalone } from './utils/platform';
 import { syncAlerts } from './utils/push';
-import { BACKGROUND_MOTION_OPTIONS } from './utils/motion';
 import { getPosition, locationFailureMessage, approximateDistance } from './utils/location';
 import type { CityMeta, WeatherData, AirQualityData } from './types';
 import './App.css';
@@ -51,9 +50,6 @@ function App() {
   const [unit, setUnit] = useState(() => readEnum(STORAGE_KEYS.unit, UNITS, 'celsius'));
   const [timeFormat, setTimeFormat] = useState(() =>
     readEnum(STORAGE_KEYS.timeFormat, TIME_FORMATS, '12h')
-  );
-  const [backgroundMotion, setBackgroundMotion] = useState(() =>
-    readEnum(STORAGE_KEYS.backgroundMotion, BACKGROUND_MOTION_OPTIONS, 'system')
   );
 
   const [currentCity, setCurrentCity] = useState<CityMeta | null>(null);
@@ -124,10 +120,6 @@ function App() {
   useEffect(() => {
     write(STORAGE_KEYS.timeFormat, timeFormat);
   }, [timeFormat]);
-
-  useEffect(() => {
-    write(STORAGE_KEYS.backgroundMotion, backgroundMotion);
-  }, [backgroundMotion]);
 
   useEffect(() => {
     write(STORAGE_KEYS.saved, JSON.stringify(savedCities));
@@ -317,9 +309,7 @@ function App() {
         </div>
 
         <div className="weather-dashboard">
-          {weather && (
-            <WeatherBackground weatherCode={weather.current.weather_code} motion={backgroundMotion} />
-          )}
+          {weather && <WeatherBackground weatherCode={weather.current.weather_code} />}
 
           {showLocationPrompt && (
             <LocationPromptModal onAllow={handleLocationAllow} onDeny={handleLocationDeny} />
@@ -330,7 +320,6 @@ function App() {
               theme={theme} setTheme={setTheme}
               unit={unit} setUnit={setUnit}
               timeFormat={timeFormat} setTimeFormat={setTimeFormat}
-              backgroundMotion={backgroundMotion} setBackgroundMotion={setBackgroundMotion}
               currentCity={currentCity}
             />
           )}

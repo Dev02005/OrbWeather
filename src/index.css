@@ -108,8 +108,7 @@ input { font-family: var(--font-primary); }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  /* The weather background is excluded: it has its own setting, which decides
-     between still and animated (see WeatherBackground). */
+  /* The weather background is excluded so it always animates. */
   *:not(.weather-bg-drop),
   *::before,
   *::after {

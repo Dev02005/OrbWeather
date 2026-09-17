@@ -16,7 +16,7 @@ OrbWeather is a responsive, installable weather dashboard built with React, Type
 - **Saved Locations**: Save favourite cities to a list in the sidebar, remembered between visits in local storage, with their live conditions shown on the dashboard.
 - **Weather Alerts**: Opt-in push notifications on phones and computers — delivered even when the app is closed — for thunderstorms, heavy rain or snow, and rain arriving within two hours.
 - **Installable & Offline**: Install from the landing page or at any time from **Settings → Install App**. Installed or not, it opens offline with the most recent forecast it loaded.
-- **Design**: A glassmorphism look with light and dark themes, and a CSS weather layer that rains, snows or drifts to match live conditions. A setting chooses whether it follows the device's reduced-motion preference, always animates, or is turned off.
+- **Design**: A glassmorphism look with light and dark themes, and an animated CSS weather layer that rains, snows or drifts to match live conditions.
 
 ## Project Structure
 
@@ -215,8 +215,8 @@ at 500 to stay inside free-tier limits.
   the dashboard navigable by screen reader.
 - Every icon-only control carries an `aria-label`; decorative icons are hidden.
 - Toasts announce through a polite live region, with alerts raised to assertive.
-- One consistent `:focus-visible` ring. Under `prefers-reduced-motion`, animations
-  are cut short and, by default, the weather background holds still.
+- One consistent `:focus-visible` ring. Under `prefers-reduced-motion`, interface
+  animations are cut short; the decorative weather background always animates.
 - Settings choices are grouped buttons with `aria-pressed`, so the selected
   option is announced, and filled buttons use a deeper blue so white text meets
   WCAG AA contrast.
@@ -243,14 +243,12 @@ A few conventions worth knowing before changing things:
 - **The weather background is pure CSS.** Rain, snow and drifting motes are
   animated with `transform` alone, so the browser runs them on the compositor.
   It replaced a canvas particle library that cost ~145 kB of JavaScript.
-- **Background motion is decided in one place.** `utils/motion.ts` resolves the
-  user's setting (*Follow device*, *Always on*, *Off*) against
-  `prefers-reduced-motion`, and the component applies a still class when needed.
-  The global reduced-motion rule in `index.css` excludes the drops, so the
-  setting can override the device in either direction.
+- **The background always animates.** The global reduced-motion rule in
+  `index.css` excludes the weather drops, so they keep moving while every other
+  interface animation respects the device setting.
 - **Content pages use CSS classes, not inline styles.** About, FAQ and the policy
   pages share `Views.css` and `Standalone.css`, so both themes apply to them.
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for more information. Copyright (c) 2026 OrbWeather (Created by Praneeth Karri).
+This project is licensed under the MIT License. See the `LICENSE` file for more information. Copyright (c) 2026 OrbWeather.

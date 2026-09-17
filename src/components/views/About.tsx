@@ -8,7 +8,7 @@ export function About() {
       </div>
       <div className="view-content">
         <p>
-          <strong>OrbWeather</strong> is a free weather dashboard created by Praneeth Karri. It
+          <strong>OrbWeather</strong> is a free weather dashboard. It
           brings current conditions, forecasts, air quality and sun and moon data for any city into
           one clear screen — with no account, no advertising and no tracking.
         </p>
