@@ -1,0 +1,42 @@
+{
+  "name": "orbweather",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Real-time weather dashboard with forecasts, air quality, an interactive map and push weather alerts.",
+  "license": "MIT",
+  "homepage": "https://orb-weather.vercel.app",
+  "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build && node scripts/prerender.mjs",
+    "lint": "oxlint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.38.4",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^1.23.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-leaflet": "^5.0.0",
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.22",
+    "@types/node": "^24.13.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@types/web-push": "^3.6.4",
+    "@vitejs/plugin-react": "^6.0.3",
+    "http_ece": "^1.2.1",
+    "oxlint": "^1.71.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.1",
+    "vitest": "^5.0.0"
+  }
+}

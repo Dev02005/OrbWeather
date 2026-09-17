@@ -1,0 +1,340 @@
+.view-container {
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  box-shadow: var(--shadow-card);
+  min-height: calc(100vh - 56px);
+}
+
+.view-header {
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.view-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.view-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.view-content p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 1.05rem;
+}
+
+/* ─── FAQ ──────────────────────────────────────────────────────────────── */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faq-item {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+}
+
+.faq-question {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+/* The whole question row is one real button, so it works from the keyboard. */
+.faq-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 16px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.faq-toggle svg {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.faq-item.open .faq-toggle svg { transform: rotate(180deg); }
+
+.faq-answer {
+  padding: 0 16px 16px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.faq-answer ul {
+  margin: 8px 0 0 20px;
+  line-height: 1.8;
+}
+
+/* ─── About ────────────────────────────────────────────────────────────── */
+.about-hero {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.about-hero-icon {
+  flex-shrink: 0;
+  border-radius: 18px;
+  box-shadow: var(--shadow-card);
+}
+
+.about-hero h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.about-tagline {
+  margin-top: 6px;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+}
+
+.about-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 24px 0 32px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--glass-border);
+  list-style: none;
+}
+
+.about-highlights li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--glass-border-hover);
+  border-radius: 999px;
+  background: var(--bg-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.about-highlights svg { color: var(--accent-emerald-text); }
+
+.about-section-title {
+  margin-bottom: 16px;
+  font-size: 1.3rem;
+  color: var(--text-primary);
+}
+
+/* Two columns while each can stay at least 280px wide, then one. */
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(max(min(100%, 280px), calc((100% - 16px) / 2)), 1fr));
+  gap: 16px;
+  list-style: none;
+}
+
+.about-sources { grid-template-columns: repeat(3, 1fr); }
+
+.about-card {
+  padding: 20px;
+  background: var(--bg-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+}
+
+.about-card-icon {
+  display: inline-flex;
+  margin-bottom: 12px;
+  padding: 9px;
+  border-radius: var(--radius-sm);
+  background: rgba(14, 165, 233, 0.12);
+  color: var(--accent-blue-text);
+}
+
+.about-card h3 {
+  margin-bottom: 6px;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.about-card h3 a { color: var(--accent-blue-text); }
+
+.view-content .about-card p {
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.view-content .about-card .about-credit {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.about-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.about-links a {
+  font-weight: 600;
+  color: var(--accent-blue-text);
+}
+
+@media (max-width: 1100px) {
+  .about-sources { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .about-hero { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .about-hero-icon { width: 56px; height: 56px; border-radius: 14px; }
+  .about-hero h1 { font-size: 1.9rem; }
+}
+
+/* Settings Styles */
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: var(--bg-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}
+
+.settings-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--accent-blue);
+}
+
+.settings-section-header h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.settings-options {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.setting-btn {
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.setting-btn:hover {
+  border-color: rgba(14, 165, 233, 0.3);
+  color: var(--text-primary);
+}
+
+.setting-btn.active {
+  background: var(--accent-blue-fill);
+  color: white;
+  border-color: var(--accent-blue-fill);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+}
+
+@media (max-width: 768px) {
+  .view-container {
+    padding: 24px;
+  }
+}
+
+/* Shared building blocks for the Settings sections (alerts, install). */
+.settings-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.settings-note {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+  max-width: 60ch;
+}
+
+.settings-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.settings-status svg { color: var(--accent-emerald); }
+
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.settings-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.settings-btn:hover:not(:disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--glass-border-hover);
+}
+
+.settings-btn.primary {
+  background: var(--accent-blue-fill);
+  border-color: var(--accent-blue-fill);
+  color: #fff;
+}
+
+.settings-btn.primary:hover:not(:disabled) { background: var(--accent-blue-fill-hover); border-color: var(--accent-blue-fill-hover); }
+
+.settings-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

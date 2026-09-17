@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>OrbWeather — World Weather Tracker, Forecasts &amp; Air Quality</title>
+    <meta
+      name="description"
+      content="Track real-time weather anywhere in the world. Hourly and 7-day forecasts, air quality, UV index, sunrise and sunset times, and an interactive weather map. Free, no account, no ads."
+    />
+    <link rel="canonical" href="https://orb-weather.vercel.app/" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta
+      name="keywords"
+      content="weather, weather forecast, hourly forecast, 7 day forecast, air quality index, UV index, weather map, radar, sunrise sunset"
+    />
+
+    <!-- Matches the app's own light/dark surfaces so mobile browser chrome blends in. -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a" />
+
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="OrbWeather" />
+
+    <!-- Fonts load in parallel with the app rather than after the stylesheet. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+
+    <!-- Warm up the data origins before the app asks for them. -->
+    <link rel="preconnect" href="https://api.open-meteo.com" crossorigin />
+    <link rel="preconnect" href="https://geocoding-api.open-meteo.com" crossorigin />
+    <link rel="dns-prefetch" href="https://air-quality-api.open-meteo.com" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="OrbWeather" />
+    <meta property="og:title" content="OrbWeather — World Weather Tracker" />
+    <meta
+      property="og:description"
+      content="Real-time weather, hourly and 7-day forecasts, air quality and an interactive map for any city in the world."
+    />
+    <meta property="og:url" content="https://orb-weather.vercel.app/" />
+    <meta property="og:image" content="https://orb-weather.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="The OrbWeather dashboard showing current conditions and forecasts." />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="OrbWeather — World Weather Tracker" />
+    <meta
+      name="twitter:description"
+      content="Real-time weather, hourly and 7-day forecasts, air quality and an interactive map for any city in the world."
+    />
+    <meta name="twitter:image" content="https://orb-weather.vercel.app/og-image.png" />
+    <meta name="twitter:image:alt" content="The OrbWeather dashboard showing current conditions and forecasts." />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "OrbWeather",
+        "url": "https://orb-weather.vercel.app/",
+        "image": "https://orb-weather.vercel.app/og-image.png",
+        "description": "Real-time weather dashboard with hourly and 7-day forecasts, air quality, UV index, astronomical data and an interactive world weather map.",
+        "applicationCategory": "WeatherApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript.",
+        "publisher": { "@type": "Organization", "name": "OrbWeather", "url": "https://orb-weather.vercel.app/" },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+          "Real-time current conditions",
+          "24-hour hourly forecast",
+          "7-day forecast",
+          "Air quality index and pollutant breakdown",
+          "UV index and moon phase",
+          "Sunrise, sunset and daylight arc",
+          "Interactive world weather map",
+          "Saved locations"
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <div style="max-width: 40rem; margin: 4rem auto; padding: 0 1.5rem; font-family: system-ui, sans-serif; line-height: 1.6;">
+        <h1>OrbWeather</h1>
+        <p>
+          OrbWeather is a live weather dashboard offering current conditions, hourly and
+          7-day forecasts, air quality readings and an interactive world map.
+        </p>
+        <p>Please enable JavaScript to use the application.</p>
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

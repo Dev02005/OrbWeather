@@ -1,0 +1,216 @@
+/* ─── Shared frame (StandaloneLayout) ──────────────────────────────────── */
+.legal-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.legal-header,
+.standalone-container,
+.legal-footer {
+  width: min(800px, calc(100% - 40px));
+  margin-inline: auto;
+}
+
+.legal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 24px;
+}
+
+.legal-brand {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+}
+
+.legal-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--glass-border-hover);
+  border-radius: 999px;
+  background: var(--bg-card);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.legal-brand:hover,
+.legal-back:hover {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.legal-back:hover { border-color: var(--text-muted); }
+
+.standalone-container {
+  margin-block: 24px 32px;
+  padding: 48px;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  color: var(--text-primary);
+  animation: fadeInUp 0.5s ease both;
+}
+
+.standalone-title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.standalone-updated {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.standalone-content {
+  margin-top: 28px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.standalone-content h2 {
+  margin: 36px 0 12px;
+  font-size: 1.3rem;
+  color: var(--text-primary);
+}
+
+.standalone-content p { margin-bottom: 16px; }
+
+.standalone-content ul {
+  margin: 0 0 20px 24px;
+}
+
+.standalone-content li { margin-bottom: 8px; }
+
+.standalone-content strong { color: var(--text-primary); }
+
+/* Body links use the darker blue: the brand colour fails contrast as text. */
+.standalone-content a {
+  color: var(--accent-blue-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.legal-section { scroll-margin-top: 24px; }
+
+/* ─── Table of contents ────────────────────────────────────────────────── */
+.legal-toc {
+  margin: 8px 0 12px;
+  padding: 20px 24px;
+  background: var(--bg-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+}
+
+.standalone-content .legal-toc-title {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.legal-toc ol {
+  margin: 0;
+  padding-left: 22px;
+  columns: 2;
+  column-gap: 40px;
+}
+
+.legal-toc li {
+  margin-bottom: 6px;
+  break-inside: avoid;
+}
+
+.standalone-content .legal-toc a { text-decoration: none; }
+.standalone-content .legal-toc a:hover { text-decoration: underline; }
+
+/* ─── Footer ───────────────────────────────────────────────────────────── */
+.legal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-top: auto;
+  padding: 8px 0 40px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.legal-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+.legal-footer-links a { color: var(--text-secondary); }
+.legal-footer-links a:hover { color: var(--text-primary); }
+
+.legal-footer-links a[aria-current='page'] {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ─── Contact ──────────────────────────────────────────────────────────── */
+.contact-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 28px 0 24px;
+  padding: 24px;
+  background: var(--bg-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}
+
+.contact-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border-radius: 50%;
+  background: var(--accent-blue-fill);
+  color: #fff;
+}
+
+.standalone-content .contact-title {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.standalone-content .contact-link {
+  display: inline-block;
+  margin-top: 2px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.standalone-content .contact-link:hover { text-decoration: underline; }
+
+@media (max-width: 768px) {
+  .legal-header,
+  .standalone-container,
+  .legal-footer {
+    width: calc(100% - 32px);
+  }
+
+  .standalone-container { padding: 28px 22px; }
+
+  .standalone-title { font-size: 1.9rem; }
+
+  .legal-toc ol { columns: 1; }
+}

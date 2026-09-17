@@ -1,0 +1,79 @@
+.error-boundary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 32px 24px;
+  text-align: center;
+  gap: 14px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+}
+
+.error-boundary-icon { color: var(--accent-amber); }
+
+.error-boundary h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.error-boundary p {
+  max-width: 48ch;
+  line-height: 1.6;
+}
+
+.error-boundary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.error-boundary-btn {
+  padding: 10px 22px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.error-boundary-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--glass-border-hover);
+}
+
+.error-boundary-btn.primary {
+  background: var(--accent-blue-fill);
+  border-color: var(--accent-blue-fill);
+  color: #fff;
+}
+
+.error-boundary-btn.primary:hover { background: var(--accent-blue-fill-hover); border-color: var(--accent-blue-fill-hover); }
+
+.error-boundary-details {
+  margin-top: 16px;
+  max-width: 90vw;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.error-boundary-details summary { cursor: pointer; }
+
+.error-boundary-details pre {
+  margin-top: 8px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  text-align: left;
+  overflow-x: auto;
+  font-family: var(--font-mono, monospace);
+}

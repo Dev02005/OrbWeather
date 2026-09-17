@@ -1,0 +1,77 @@
+.map-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.map-wrapper {
+  flex: 1;
+  min-height: 500px;
+  position: relative;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-card);
+}
+
+/* Fix for dark mode map contrast */
+.dark-theme .leaflet-layer,
+.dark-theme .leaflet-control-zoom-in,
+.dark-theme .leaflet-control-zoom-out,
+.dark-theme .leaflet-control-attribution {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+.leaflet-popup-content p {
+  margin: 0 !important;
+}
+
+.map-loading-overlay {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--bg-primary);
+  padding: 12px;
+  border-radius: 50%;
+  box-shadow: var(--shadow-md);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--glass-border);
+}
+
+.map-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(14, 165, 233, 0.2);
+  border-top-color: var(--accent-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.custom-orb-icon {
+  background: transparent;
+  border: none;
+}
+
+.orb-marker {
+  width: 20px;
+  height: 20px;
+  background: var(--accent-blue);
+  border-radius: 50%;
+  box-shadow: 0 0 15px var(--accent-blue), 0 0 30px var(--accent-blue);
+  border: 2px solid white;
+  animation: pulse-orb 2s infinite;
+}
+
+@keyframes pulse-orb {
+  0% { transform: scale(1); box-shadow: 0 0 15px var(--accent-blue); }
+  50% { transform: scale(1.2); box-shadow: 0 0 25px var(--accent-blue), 0 0 10px white; }
+  100% { transform: scale(1); box-shadow: 0 0 15px var(--accent-blue); }
+}
+
+.radar-map {
+  height: 100%;
+  width: 100%;
+  border-radius: 12px;
+}

@@ -1,0 +1,76 @@
+/** App-wide preference values. */
+export type TemperatureUnit = 'celsius' | 'fahrenheit';
+export type TimeFormat = '12h' | '24h';
+export type Theme = 'light' | 'dark';
+
+export interface Coordinates {
+  lat: number;
+  lon: number;
+}
+
+export interface CityMeta {
+  name: string;
+  countryCode: string;
+  country: string;
+  admin1?: string;
+  lat: number;
+  lon: number;
+}
+
+export interface WeatherData {
+  current: {
+    temperature_2m: number;
+    relative_humidity_2m: number;
+    apparent_temperature: number;
+    weather_code: number;
+    wind_speed_10m: number;
+    wind_direction_10m: number;
+    surface_pressure: number;
+    visibility: number;
+    is_day: number;
+  };
+  hourly: {
+    time: string[];
+    temperature_2m: number[];
+    weather_code: number[];
+    precipitation_probability: number[];
+  };
+  daily: {
+    time: string[];
+    weather_code: number[];
+    temperature_2m_max: number[];
+    temperature_2m_min: number[];
+    sunrise: string[];
+    sunset: string[];
+    uv_index_max: number[];
+  };
+  timezone: string;
+}
+
+export interface AirQualityData {
+  current: {
+    pm10: number;
+    pm2_5: number;
+    carbon_monoxide: number;
+    nitrogen_dioxide: number;
+    ozone: number;
+    sulphur_dioxide: number;
+    european_aqi: number;
+  };
+}
+
+/**
+ * Chromium's PWA install prompt. Not part of lib.dom, so it is declared here
+ * rather than reaching for `any` at the call site.
+ */
+export interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[];
+  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+  prompt(): Promise<void>;
+}
+
+declare global {
+  interface WindowEventMap {
+    beforeinstallprompt: BeforeInstallPromptEvent;
+  }
+}

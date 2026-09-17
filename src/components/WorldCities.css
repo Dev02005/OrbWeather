@@ -1,0 +1,64 @@
+.world-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+}
+
+.world-cities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.world-city-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 20px 16px;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.world-city-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-violet));
+  transform: scaleX(0);
+  transition: transform var(--transition);
+}
+
+.world-city-card:hover {
+  border-color: var(--glass-border-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+.world-city-card:hover::after { transform: scaleX(1); }
+
+.wc-icon-wrapper {
+  position: absolute;
+  top: 20px;
+  right: 16px;
+  color: var(--accent-blue);
+  opacity: 0.8;
+}
+
+.wc-city { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+.wc-country { font-size: 0.72rem; font-weight: 500; color: var(--text-muted); margin-bottom: 12px; }
+.wc-temp { font-size: 2rem; font-weight: 300; color: var(--text-primary); font-family: var(--font-mono); letter-spacing: -1px; }
+.wc-desc { font-size: 0.75rem; color: var(--text-secondary); text-transform: capitalize; margin-top: 4px; font-weight: 600; }
+
+.world-city-card.skeleton {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.skeleton .wc-temp { color: var(--text-muted); font-size: 1.2rem; }
+
+@media (max-width: 600px) {
+  .world-cities-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+}

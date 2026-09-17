@@ -1,0 +1,385 @@
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
+import { Menu, Search, MapPin } from 'lucide-react';
+import { Sidebar } from './components/Sidebar';
+import { HeroCard } from './components/HeroCard';
+import { StatsRow } from './components/StatsRow';
+import { Forecast } from './components/Forecast';
+import { AirQuality } from './components/AirQuality';
+import { WorldCities } from './components/WorldCities';
+import { Settings } from './components/views/Settings';
+import { Faq } from './components/views/Faq';
+import { About } from './components/views/About';
+import { LandingPage } from './components/views/LandingPage';
+import { LocationPromptModal } from './components/LocationPromptModal';
+import { UvMoonCard } from './components/UvMoonCard';
+import { SunArc } from './components/SunArc';
+import { WeatherBackground } from './components/WeatherBackground';
+import { fetchWeather, isAbortError } from './services/weather';
+import { reverseGeocode } from './services/geocoding';
+import { useToast } from './contexts/toast-context';
+import { useRoute, applyRouteMeta } from './hooks/useRoute';
+import { STORAGE_KEYS, readEnum, readBoolean, readCity, readCityList, write } from './utils/storage';
+import { isStandalone } from './utils/platform';
+import { sameCity } from './utils/city';
+import { syncAlerts } from './utils/push';
+import { getPosition, locationFailureMessage, approximateDistance } from './utils/location';
+import type { AirQualityData, CityMeta, TemperatureUnit, WeatherData } from './types';
+import './App.css';
+
+// Leaflet is the heaviest dependency and is not needed for the first paint,
+// so the map loads on demand rather than in the main bundle.
+const RadarMap = lazy(() =>
+  import('./components/views/RadarMap').then(m => ({ default: m.RadarMap }))
+);
+
+const THEMES = ['light', 'dark'] as const;
+const UNITS = ['celsius', 'fahrenheit'] as const;
+const TIME_FORMATS = ['12h', '24h'] as const;
+
+/** How often an open, visible dashboard refreshes its data. */
+const REFRESH_INTERVAL_MS = 15 * 60 * 1000;
+
+function App() {
+  const { route, navigate } = useRoute();
+  const activeView = route.view;
+
+  const [hasStarted, setHasStarted] = useState(
+    () => isStandalone() || readBoolean(STORAGE_KEYS.started)
+  );
+
+  const [theme, setTheme] = useState(() => readEnum(STORAGE_KEYS.theme, THEMES, 'light'));
+  const [unit, setUnit] = useState(() => readEnum(STORAGE_KEYS.unit, UNITS, 'celsius'));
+  const [timeFormat, setTimeFormat] = useState(() =>
+    readEnum(STORAGE_KEYS.timeFormat, TIME_FORMATS, '12h')
+  );
+
+  const [currentCity, setCurrentCity] = useState<CityMeta | null>(null);
+  const [savedCities, setSavedCities] = useState<CityMeta[]>(() =>
+    readCityList(STORAGE_KEYS.saved)
+  );
+
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [aq, setAq] = useState<AirQualityData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
+
+  const { showToast } = useToast();
+  const inFlight = useRef<AbortController | null>(null);
+
+  /**
+   * Every load goes through here. The previous request is aborted first, so a
+   * slow earlier response can never overwrite a newer city's data.
+   */
+  const loadWeather = useCallback(
+    async (city: CityMeta, currentUnit: TemperatureUnit) => {
+      inFlight.current?.abort();
+      const controller = new AbortController();
+      inFlight.current = controller;
+
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchWeather(
+          { lat: city.lat, lon: city.lon },
+          currentUnit,
+          controller.signal
+        );
+        setWeather(data.weather);
+        setAq(data.aq);
+        write(STORAGE_KEYS.lastCity, JSON.stringify(city));
+      } catch (err) {
+        if (isAbortError(err)) return; // superseded by a newer request
+        console.error('Weather request failed:', err);
+        setError('Failed to load weather data.');
+      } finally {
+        if (inFlight.current === controller) {
+          inFlight.current = null;
+          setLoading(false);
+        }
+      }
+    },
+    []
+  );
+
+  useEffect(() => () => inFlight.current?.abort(), []);
+
+  useEffect(() => {
+    write(STORAGE_KEYS.theme, theme);
+    document.body.classList.toggle('dark-theme', theme === 'dark');
+  }, [theme]);
+
+  useEffect(() => {
+    write(STORAGE_KEYS.unit, unit);
+  }, [unit]);
+
+  /** Switching units re-fetches, since the API returns values in the chosen unit. */
+  const changeUnit = useCallback((next: TemperatureUnit) => {
+    setUnit(next);
+    if (currentCity) loadWeather(currentCity, next);
+  }, [currentCity, loadWeather]);
+
+  useEffect(() => {
+    write(STORAGE_KEYS.timeFormat, timeFormat);
+  }, [timeFormat]);
+
+  useEffect(() => {
+    write(STORAGE_KEYS.saved, JSON.stringify(savedCities));
+  }, [savedCities]);
+
+  // Keep document metadata in step with the route, so shared links and browser
+  // history describe what is actually on screen.
+  useEffect(() => {
+    const onDashboard = activeView === 'dashboard';
+    applyRouteMeta(
+      route,
+      onDashboard && currentCity && weather
+        ? {
+            title: `${Math.round(weather.current.temperature_2m)}°${unit === 'celsius' ? 'C' : 'F'} in ${currentCity.name} — OrbWeather`,
+            description: `Current conditions, hourly and 7-day forecast, and air quality for ${currentCity.name}${currentCity.country ? `, ${currentCity.country}` : ''}.`,
+          }
+        : undefined
+    );
+  }, [route, activeView, currentCity, weather, unit]);
+
+  // Keep an open dashboard current. Hidden tabs are skipped — push alerts cover
+  // the time the app is not being looked at.
+  useEffect(() => {
+    if (!currentCity) return;
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') loadWeather(currentCity, unit);
+    }, REFRESH_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [currentCity, unit, loadWeather]);
+
+  // Re-register this device's alert subscription on launch and whenever the
+  // 12/24-hour preference used in alert messages changes.
+  useEffect(() => {
+    if (import.meta.env.PROD) syncAlerts(timeFormat).catch(() => undefined);
+  }, [timeFormat]);
+
+  // Restore the last city, or ask for location if there is none. `loadWeather`
+  // never changes, so this runs on first load only. No run-once guard: React's
+  // development double-mount cancels the first request, and the second run
+  // must be free to start it again.
+  useEffect(() => {
+    const lastCity = readCity(STORAGE_KEYS.lastCity);
+    if (lastCity) {
+      setCurrentCity(lastCity);
+      loadWeather(lastCity, readEnum(STORAGE_KEYS.unit, UNITS, 'celsius'));
+      return;
+    }
+    setShowLocationPrompt(true);
+    setLoading(false);
+  }, [loadWeather]);
+
+  /** Finds the device, loads its weather, and reports how it went. */
+  const detectLocation = useCallback(async (): Promise<
+    { city: CityMeta; accuracy: number } | { error: string }
+  > => {
+    const position = await getPosition();
+    if (!position.ok) return { error: locationFailureMessage(position.reason) };
+
+    const city = await reverseGeocode(position.lat, position.lon);
+    if (!city) return { error: locationFailureMessage('lookup') };
+
+    setCurrentCity(city);
+    await loadWeather(city, unit);
+    return { city, accuracy: position.accuracy };
+  }, [loadWeather, unit]);
+
+  /**
+   * Computers without GPS often only know their position to within tens of
+   * kilometres, which can land in the wrong city. Say so rather than presenting
+   * a guess with the same confidence as a real fix.
+   */
+  const announceLocation = useCallback((city: CityMeta, accuracy: number) => {
+    const distance = approximateDistance(accuracy);
+    if (distance) {
+      showToast(
+        'Approximate Location',
+        `Showing ${city.name}, but your device only knows where you are to within ${distance}. If that’s not your city, search for it.`,
+        'info'
+      );
+    } else {
+      showToast('Location Found', `Showing weather for ${city.name}.`, 'success');
+    }
+  }, [showToast]);
+
+  const handleCurrentLocation = async () => {
+    const result = await detectLocation();
+    navigate('dashboard');
+    if ('error' in result) {
+      showToast('Location Unavailable', result.error, 'error');
+      return;
+    }
+    announceLocation(result.city, result.accuracy);
+  };
+
+  const handleLocationAllow = async () => {
+    setShowLocationPrompt(false);
+    setLoading(true);
+    const result = await detectLocation();
+    if ('error' in result) {
+      // Leave the dashboard on its "choose a city" state and open search.
+      setLoading(false);
+      setSidebarOpen(true);
+      showToast('Location Unavailable', result.error, 'error');
+      return;
+    }
+    announceLocation(result.city, result.accuracy);
+  };
+
+  const handleLocationDeny = () => {
+    setShowLocationPrompt(false);
+    setSidebarOpen(true); // so they can search straight away
+  };
+
+  const handleMapLocationSelect = async (lat: number, lon: number) => {
+    const city = await reverseGeocode(lat, lon);
+    if (!city) return;
+    setCurrentCity(city);
+    await loadWeather(city, unit);
+    navigate('dashboard');
+  };
+
+  const handleCitySelect = async (city: CityMeta) => {
+    setCurrentCity(city);
+    await loadWeather(city, unit);
+  };
+
+  const handleSaveCity = (city: CityMeta) => {
+    if (savedCities.some(c => sameCity(c, city))) return;
+    setSavedCities([...savedCities, city]);
+    showToast('City Saved', `${city.name} has been added to your saved cities.`, 'success');
+  };
+
+  const handleRemoveCity = (city: CityMeta) => {
+    setSavedCities(savedCities.filter(c => !sameCity(c, city)));
+    showToast('City Removed', `${city.name} has been removed.`, 'info');
+  };
+
+  const handleStart = () => {
+    write(STORAGE_KEYS.started, 'true');
+    setHasStarted(true);
+  };
+
+  if (!hasStarted) {
+    return <LandingPage onStart={handleStart} />;
+  }
+
+  return (
+    <div className="app">
+      <a className="visually-hidden skip-link" href="#main-content">Skip to main content</a>
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        onCitySelect={handleCitySelect}
+        currentCity={currentCity}
+        savedCities={savedCities}
+        onSaveCity={handleSaveCity}
+        onRemoveCity={handleRemoveCity}
+        onNavigate={navigate}
+        onCurrentLocation={handleCurrentLocation}
+      />
+
+      <main className="main-content" id="main-content">
+        <div className="mobile-topbar">
+          <button
+            className="mobile-menu-btn"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open navigation menu"
+          >
+            <Menu size={24} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className="mobile-logo"
+            onClick={() => navigate('dashboard')}
+            aria-label="OrbWeather home"
+          >
+            <span>OrbWeather</span>
+          </button>
+          <button
+            className="mobile-search-btn"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Search for a city"
+          >
+            <Search size={20} aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="weather-dashboard">
+          {weather && <WeatherBackground weatherCode={weather.current.weather_code} />}
+
+          {showLocationPrompt && (
+            <LocationPromptModal onAllow={handleLocationAllow} onDeny={handleLocationDeny} />
+          )}
+
+          {activeView === 'settings' && (
+            <Settings
+              theme={theme} setTheme={setTheme}
+              unit={unit} setUnit={changeUnit}
+              timeFormat={timeFormat} setTimeFormat={setTimeFormat}
+              currentCity={currentCity}
+            />
+          )}
+          {activeView === 'faq' && <Faq />}
+          {activeView === 'about' && <About />}
+          {activeView === 'radar' && currentCity && (
+            <Suspense fallback={<div className="loading-state"><div className="spinner" /><p>Loading map…</p></div>}>
+              <RadarMap currentCity={currentCity} onLocationSelect={handleMapLocationSelect} />
+            </Suspense>
+          )}
+
+          {activeView === 'dashboard' && (
+            loading && !weather ? (
+              <div className="loading-state" role="status">
+                <div className="spinner"></div>
+                <p>Fetching live weather data...</p>
+              </div>
+            ) : error ? (
+              <div className="error-state" role="alert">
+                <h3>Oops!</h3>
+                <p>{error}</p>
+                <button onClick={() => currentCity && loadWeather(currentCity, unit)}>Retry</button>
+              </div>
+            ) : weather && aq && currentCity ? (
+              <>
+                <HeroCard weather={weather} cityMeta={currentCity} unit={unit} timeFormat={timeFormat} />
+                <StatsRow weather={weather} unit={unit} timeFormat={timeFormat} />
+                <div className="dashboard-row">
+                  <UvMoonCard uvIndex={weather.daily.uv_index_max[0] || 0} />
+                  <SunArc sunrise={weather.daily.sunrise[0]} sunset={weather.daily.sunset[0]} timezone={weather.timezone} timeFormat={timeFormat} />
+                </div>
+                <Forecast weather={weather} timeFormat={timeFormat} />
+                <AirQuality aq={aq} />
+                <WorldCities unit={unit} savedCities={savedCities} onCitySelect={handleCitySelect} />
+              </>
+            ) : !showLocationPrompt ? (
+              <div className="empty-state">
+                <MapPin size={40} className="empty-state-icon" aria-hidden="true" />
+                <h2>No location selected</h2>
+                <p>
+                  Search for a city or use your current location to see live conditions,
+                  forecasts and air quality.
+                </p>
+                <div className="empty-state-actions">
+                  <button className="empty-state-btn primary" onClick={() => setSidebarOpen(true)}>
+                    <Search size={16} aria-hidden="true" /> Search for a city
+                  </button>
+                  <button className="empty-state-btn" onClick={handleCurrentLocation}>
+                    <MapPin size={16} aria-hidden="true" /> Use current location
+                  </button>
+                </div>
+              </div>
+            ) : null
+          )}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+export default App;
