@@ -15,6 +15,10 @@
      WCAG AA contrast. Icons and large text keep the brand colours. */
   --accent-blue-text: #0369a1;
   --accent-emerald-text: #047857;
+  /* Filled controls carry white text, which needs a deeper blue than the brand
+     colour to pass WCAG AA: 5.9:1 at rest, 7.6:1 on hover. Same in both themes. */
+  --accent-blue-fill: #0369a1;
+  --accent-blue-fill-hover: #075985;
 
   --text-primary: #0f172a;
   --text-secondary: #475569;
@@ -88,7 +92,7 @@ input { font-family: var(--font-primary); }
   padding: 12px 20px;
   clip: auto;
   clip-path: none;
-  background: var(--accent-blue);
+  background: var(--accent-blue-fill);
   color: #fff;
   border-radius: var(--radius-sm);
   font-weight: 600;
@@ -104,7 +108,9 @@ input { font-family: var(--font-primary); }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *,
+  /* The weather background is excluded: it has its own setting, which decides
+     between still and animated (see WeatherBackground). */
+  *:not(.weather-bg-drop),
   *::before,
   *::after {
     animation-duration: 0.01ms !important;

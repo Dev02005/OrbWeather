@@ -51,12 +51,12 @@
 }
 
 .error-boundary-btn.primary {
-  background: var(--accent-blue);
-  border-color: var(--accent-blue);
+  background: var(--accent-blue-fill);
+  border-color: var(--accent-blue-fill);
   color: #fff;
 }
 
-.error-boundary-btn.primary:hover { background: #0284c7; border-color: #0284c7; }
+.error-boundary-btn.primary:hover { background: var(--accent-blue-fill-hover); border-color: var(--accent-blue-fill-hover); }
 
 .error-boundary-details {
   margin-top: 16px;

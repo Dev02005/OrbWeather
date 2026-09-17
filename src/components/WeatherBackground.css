@@ -74,16 +74,13 @@
 }
 
 /*
- * Reduced motion: keep showing the weather, but still. Each drop rests at its
- * own height instead of falling. `animation: none` must beat the global
- * reduced-motion rule in index.css, which otherwise plays every animation
- * instantly and leaves all the drops piled along the top edge.
+ * Still mode: shown when the device asks for reduced motion and the user has
+ * not switched the animation on. Each drop rests at its own height instead of
+ * falling. The component applies this class, so the setting can override it.
  */
-@media (prefers-reduced-motion: reduce) {
-  .weather-bg-drop {
-    top: var(--drop-top, 0);
-    animation: none !important;
-  }
-
-  .weather-bg-rain .weather-bg-drop { transform: rotate(14deg); }
+.weather-bg-still .weather-bg-drop {
+  top: var(--drop-top, 0);
+  animation: none;
 }
+
+.weather-bg-still.weather-bg-rain .weather-bg-drop { transform: rotate(14deg); }

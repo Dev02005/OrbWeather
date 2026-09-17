@@ -74,7 +74,7 @@
 }
 
 .btn-primary {
-  background: var(--accent-blue);
+  background: var(--accent-blue-fill);
   color: white;
   border: none;
   padding: 14px 24px;

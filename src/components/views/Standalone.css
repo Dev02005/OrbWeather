@@ -82,7 +82,7 @@
 .contact-footnote { margin-top: 24px; }
 
 .contact-icon {
-  background: var(--accent-blue);
+  background: var(--accent-blue-fill);
   color: white;
   padding: 12px;
   border-radius: 50%;

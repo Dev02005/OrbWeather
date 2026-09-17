@@ -215,7 +215,7 @@
 }
 
 .header-download-btn:hover {
-  background: var(--accent-blue);
+  background: var(--accent-blue-fill-hover);
   color: white;
 }
 

@@ -90,9 +90,10 @@ export function Faq() {
           </FaqItem>
 
           <FaqItem question="Why isn’t the rain or snow in the background moving?">
-            OrbWeather follows your device’s <em>reduce motion</em> setting. When it is on, the
-            background still shows the weather, but holds still instead of animating. To see it
-            move, turn animations back on:
+            By default OrbWeather follows your device’s <em>reduce motion</em> setting. When that is
+            on, the background still shows the weather but holds still. To make it move anyway, open{' '}
+            <strong>Settings → Background Animation</strong> and choose <strong>Always on</strong>.
+            Alternatively, turn animations back on for your whole device:
             <ul>
               <li><strong>Windows:</strong> Settings → Accessibility → Visual effects → Animation effects (on)</li>
               <li><strong>Mac:</strong> System Settings → Accessibility → Display → Reduce motion (off)</li>

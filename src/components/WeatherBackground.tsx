@@ -1,15 +1,20 @@
 import { useMemo } from 'react';
 import { precipitationKind } from '../utils/precipitation';
+import { backgroundMode } from '../utils/motion';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
+import type { BackgroundMotion } from '../utils/motion';
 import './WeatherBackground.css';
 
 interface WeatherBackgroundProps {
   weatherCode: number;
+  /** The user's setting; "system" follows the device's reduced-motion preference. */
+  motion: BackgroundMotion;
 }
 
 /** Per-drop variation, fixed once so the animation never re-randomises on render. */
 interface Drop {
   left: number;
-  /** Resting height, used when the device asks for reduced motion. */
+  /** Resting height, used when the background is shown still. */
   top: number;
   duration: number;
   delay: number;
@@ -35,11 +40,13 @@ function makeDrops(count: number, minDuration: number, maxDuration: number): Dro
  * A decorative layer behind the dashboard that reflects the current conditions.
  *
  * Drawn with CSS transforms rather than a canvas library: it costs no JavaScript
- * at runtime, the browser animates it on the compositor, and for anyone who
- * prefers reduced motion it holds still rather than disappearing.
+ * at runtime and the browser animates it on the compositor. Whether it moves is
+ * decided here rather than by a CSS media query, so the user's setting can
+ * override the device's reduced-motion preference in either direction.
  */
-export function WeatherBackground({ weatherCode }: WeatherBackgroundProps) {
+export function WeatherBackground({ weatherCode, motion }: WeatherBackgroundProps) {
   const kind = precipitationKind(weatherCode);
+  const mode = backgroundMode(motion, usePrefersReducedMotion());
 
   const drops = useMemo(() => {
     if (kind === 'rain') return makeDrops(COUNTS.rain, 0.5, 1.1);
@@ -47,8 +54,13 @@ export function WeatherBackground({ weatherCode }: WeatherBackgroundProps) {
     return makeDrops(COUNTS.calm, 14, 26);
   }, [kind]);
 
+  if (mode === 'hidden') return null;
+
   return (
-    <div className={`weather-bg weather-bg-${kind}`} aria-hidden="true">
+    <div
+      className={`weather-bg weather-bg-${kind}${mode === 'still' ? ' weather-bg-still' : ''}`}
+      aria-hidden="true"
+    >
       {drops.map((drop, i) => (
         <span
           key={i}
