@@ -1,4 +1,4 @@
-import type { CityMeta } from '../types';
+import type { CityMeta, TimeFormat } from '../types';
 import { isIOS, isStandalone } from './platform';
 import { STORAGE_KEYS, readCity, remove, write } from './storage';
 
@@ -71,7 +71,7 @@ export async function currentSubscription(): Promise<PushSubscription | null> {
 /** The city alerts are currently set up for on this device, if any. */
 export const alertsCity = () => readCity(STORAGE_KEYS.alertsCity);
 
-function subscribeBody(subscription: PushSubscription, city: CityMeta, timeFormat: '12h' | '24h') {
+function subscribeBody(subscription: PushSubscription, city: CityMeta, timeFormat: TimeFormat) {
   return {
     subscription: subscription.toJSON(),
     city: { name: city.name, lat: city.lat, lon: city.lon },
@@ -80,7 +80,7 @@ function subscribeBody(subscription: PushSubscription, city: CityMeta, timeForma
 }
 
 /** Asks permission, subscribes this device, and registers it for `city`. */
-export async function enableAlerts(city: CityMeta, timeFormat: '12h' | '24h'): Promise<void> {
+export async function enableAlerts(city: CityMeta, timeFormat: TimeFormat): Promise<void> {
   // Ask first, while this still runs inside the tap that triggered it: Safari
   // ignores permission prompts that arrive after unrelated awaits.
   const permission = await Notification.requestPermission();
@@ -135,7 +135,7 @@ export async function sendTestAlert(): Promise<void> {
  * sides drift apart — a record pruned by the server, a rotated endpoint, a
  * changed 12/24-hour preference — for the cost of one small request.
  */
-export async function syncAlerts(timeFormat: '12h' | '24h'): Promise<void> {
+export async function syncAlerts(timeFormat: TimeFormat): Promise<void> {
   const city = alertsCity();
   if (!city || alertSupport() !== 'supported' || Notification.permission !== 'granted') return;
 

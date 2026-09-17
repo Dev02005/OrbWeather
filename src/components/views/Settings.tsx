@@ -3,18 +3,14 @@ import { Moon, Sun, Thermometer, Clock, Bell, Download } from 'lucide-react';
 import { useToast } from '../../contexts/toast-context';
 import { WeatherAlerts } from '../WeatherAlerts';
 import { InstallApp } from '../InstallApp';
-import type { CityMeta } from '../../types';
+import type { CityMeta, TemperatureUnit, Theme, TimeFormat } from '../../types';
 import './Views.css';
-
-type Theme = 'light' | 'dark';
-type Unit = 'celsius' | 'fahrenheit';
-type TimeFormat = '12h' | '24h';
 
 interface SettingsProps {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  unit: Unit;
-  setUnit: (unit: Unit) => void;
+  unit: TemperatureUnit;
+  setUnit: (unit: TemperatureUnit) => void;
   timeFormat: TimeFormat;
   setTimeFormat: (format: TimeFormat) => void;
   currentCity: CityMeta | null;
@@ -107,7 +103,7 @@ export function Settings({
           />
         </SettingsSection>
 
-        <SettingsSection icon={<Thermometer size={20} />} title="Temperature Unit">
+        <SettingsSection icon={<Thermometer size={20} />} title="Temperature TemperatureUnit">
           <OptionGroup
             label="Temperature unit"
             value={unit}
@@ -115,7 +111,7 @@ export function Settings({
             onChange={next => {
               setUnit(next);
               showToast(
-                'Unit Updated',
+                'TemperatureUnit Updated',
                 `Temperature set to ${next === 'celsius' ? 'Celsius (°C)' : 'Fahrenheit (°F)'}.`,
                 'success'
               );

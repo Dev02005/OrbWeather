@@ -20,9 +20,10 @@ import { useToast } from './contexts/toast-context';
 import { useRoute, applyRouteMeta } from './hooks/useRoute';
 import { STORAGE_KEYS, readEnum, readBoolean, readCity, readCityList, write } from './utils/storage';
 import { isStandalone } from './utils/platform';
+import { sameCity } from './utils/city';
 import { syncAlerts } from './utils/push';
 import { getPosition, locationFailureMessage, approximateDistance } from './utils/location';
-import type { CityMeta, WeatherData, AirQualityData } from './types';
+import type { AirQualityData, CityMeta, TemperatureUnit, WeatherData } from './types';
 import './App.css';
 
 // Leaflet is the heaviest dependency and is not needed for the first paint,
@@ -72,7 +73,7 @@ function App() {
    * slow earlier response can never overwrite a newer city's data.
    */
   const loadWeather = useCallback(
-    async (city: CityMeta, currentUnit: 'celsius' | 'fahrenheit') => {
+    async (city: CityMeta, currentUnit: TemperatureUnit) => {
       inFlight.current?.abort();
       const controller = new AbortController();
       inFlight.current = controller;
@@ -111,11 +112,13 @@ function App() {
 
   useEffect(() => {
     write(STORAGE_KEYS.unit, unit);
-    if (currentCity) loadWeather(currentCity, unit);
-    // currentCity is deliberately omitted: selecting a city already loads it,
-    // and including it here would double-fetch on every change.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unit, loadWeather]);
+  }, [unit]);
+
+  /** Switching units re-fetches, since the API returns values in the chosen unit. */
+  const changeUnit = useCallback((next: TemperatureUnit) => {
+    setUnit(next);
+    if (currentCity) loadWeather(currentCity, next);
+  }, [currentCity, loadWeather]);
 
   useEffect(() => {
     write(STORAGE_KEYS.timeFormat, timeFormat);
@@ -156,8 +159,12 @@ function App() {
     if (import.meta.env.PROD) syncAlerts(timeFormat).catch(() => undefined);
   }, [timeFormat]);
 
-  // Restore the last city, or ask for location if there is none.
+  // Restore the last city, or ask for location if there is none — once, on first load.
+  const restored = useRef(false);
   useEffect(() => {
+    if (restored.current) return;
+    restored.current = true;
+
     const lastCity = readCity(STORAGE_KEYS.lastCity);
     if (lastCity) {
       setCurrentCity(lastCity);
@@ -166,8 +173,7 @@ function App() {
     }
     setShowLocationPrompt(true);
     setLoading(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadWeather, unit]);
 
   /** Finds the device, loads its weather, and reports how it went. */
   const detectLocation = useCallback(async (): Promise<
@@ -244,9 +250,6 @@ function App() {
     await loadWeather(city, unit);
   };
 
-  const sameCity = (a: CityMeta, b: CityMeta) =>
-    a.name === b.name && a.lat === b.lat && a.lon === b.lon;
-
   const handleSaveCity = (city: CityMeta) => {
     if (savedCities.some(c => sameCity(c, city))) return;
     setSavedCities([...savedCities, city]);
@@ -318,7 +321,7 @@ function App() {
           {activeView === 'settings' && (
             <Settings
               theme={theme} setTheme={setTheme}
-              unit={unit} setUnit={setUnit}
+              unit={unit} setUnit={changeUnit}
               timeFormat={timeFormat} setTimeFormat={setTimeFormat}
               currentCity={currentCity}
             />
@@ -347,7 +350,7 @@ function App() {
               <>
                 <HeroCard weather={weather} cityMeta={currentCity} unit={unit} timeFormat={timeFormat} />
                 <StatsRow weather={weather} unit={unit} timeFormat={timeFormat} />
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '24px' }}>
+                <div className="dashboard-row">
                   <UvMoonCard uvIndex={weather.daily.uv_index_max[0] || 0} />
                   <SunArc sunrise={weather.daily.sunrise[0]} sunset={weather.daily.sunset[0]} timezone={weather.timezone} timeFormat={timeFormat} />
                 </div>

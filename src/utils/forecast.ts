@@ -1,4 +1,4 @@
-import type { WeatherData } from '../types';
+import type { TimeFormat, WeatherData } from '../types';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
 
@@ -19,7 +19,7 @@ export function formatDay(isoDate: string): string {
  * Parsing it instead would re-interpret it in the browser's zone, which shifts
  * across a local DST boundary.
  */
-export function formatHour(isoTime: string, timeFormat: '12h' | '24h'): string {
+export function formatHour(isoTime: string, timeFormat: TimeFormat): string {
   const hour = Number(isoTime.slice(11, 13));
   if (timeFormat === '24h') {
     return `${hour.toString().padStart(2, '0')}:00`;

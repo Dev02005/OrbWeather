@@ -1,3 +1,8 @@
+/** App-wide preference values. */
+export type TemperatureUnit = 'celsius' | 'fahrenheit';
+export type TimeFormat = '12h' | '24h';
+export type Theme = 'light' | 'dark';
+
 export interface Coordinates {
   lat: number;
   lon: number;

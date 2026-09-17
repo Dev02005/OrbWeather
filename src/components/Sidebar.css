@@ -270,3 +270,16 @@
   animation: spin 1s linear infinite;
 }
 
+.suggestion-text { flex: 1; min-width: 0; }
+
+.sidebar-actions {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-btn-label { flex: 1; text-align: left; }
+
+/* Pushes Settings and the footer to the bottom of the sidebar. */
+.sidebar-settings { margin-top: auto; }

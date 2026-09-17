@@ -102,7 +102,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
             </button>
           </div>
 
-          <div className="landing-text-content animate-fade-up" style={{ animationDelay: '0.1s' }}>
+          <div className="landing-text-content animate-fade-up fade-delay-1">
             <h3>More Than Just a Forecast</h3>
             <p>
               OrbWeather isn't just another weather website. It's a fully-fledged progressive web application designed to bring you the highest quality meteorological data without the bloat. 
@@ -113,7 +113,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
             </p>
           </div>
 
-          <div className="hero-features" style={{ animationDelay: '0.2s' }}>
+          <div className="hero-features">
             <div className="feature-card">
               <Map size={28} className="feature-icon text-yellow" />
               <h3>Interactive Map</h3>

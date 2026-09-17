@@ -35,7 +35,7 @@ export function UvMoonCard({ uvIndex }: UvMoonCardProps) {
   const uvRisk = getUvRisk(uvIndex);
 
   return (
-    <section className="uv-moon-card animate-fade-up" style={{ animationDelay: '0.2s' }}>
+    <section className="uv-moon-card animate-fade-up fade-delay-2">
       <div className="um-column">
         <h2 className="um-header">
           <Sun size={20} className="um-icon" style={{ color: uvRisk.color }} />

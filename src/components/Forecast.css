@@ -67,6 +67,7 @@
 .weekly-list { display: flex; flex-direction: column; gap: 8px; }
 
 .weekly-item {
+  cursor: pointer;
   display: flex;
   align-items: center;
   padding: 14px 16px;
@@ -121,3 +122,13 @@
   .weekly-bar-track { min-width: 50px; }
   .weekly-day { width: 70px; }
 }
+
+/* The hourly strip inside an expanded day. */
+.hourly-scroll-nested {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+/* Keeps hours without a rain chance the same height, but unseen and unread. */
+.hourly-pop-empty { visibility: hidden; }

@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Sunrise, Sunset } from 'lucide-react';
 import { cityNow, wallClockMs, formatWallClockTime } from '../utils/time';
+import type { TimeFormat } from '../types';
 import './SunArc.css';
 
 interface SunArcProps {
   sunrise: string;
   sunset: string;
   timezone: string;
-  timeFormat: '12h' | '24h';
+  timeFormat: TimeFormat;
 }
 
 export function SunArc({ sunrise, sunset, timezone, timeFormat }: SunArcProps) {
@@ -48,7 +49,7 @@ export function SunArc({ sunrise, sunset, timezone, timeFormat }: SunArcProps) {
   const sunY = cy - radius * Math.sin(angle);
 
   return (
-    <section className="sun-arc-card animate-fade-up" style={{ animationDelay: '0.3s' }}>
+    <section className="sun-arc-card animate-fade-up fade-delay-3">
       <div className="sac-header">
         <h2>Daylight</h2>
       </div>

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
+import { regionOf } from '../utils/city';
 import { Globe2 } from 'lucide-react';
-import type { CityMeta, WeatherData } from '../types';
+import type { CityMeta, TemperatureUnit, WeatherData } from '../types';
 import { fetchWeather, getWMO } from '../services/weather';
 import { getWeatherIcon } from '../utils/iconMap';
 import './WorldCities.css';
 
 interface WorldCitiesProps {
-  unit: 'celsius' | 'fahrenheit';
+  unit: TemperatureUnit;
   savedCities: CityMeta[];
   onCitySelect: (city: CityMeta) => void;
 }
@@ -40,7 +41,7 @@ export function WorldCities({ unit, savedCities, onCitySelect }: WorldCitiesProp
   }
 
   return (
-    <section className="world-section animate-fade-up" style={{ animationDelay: '0.4s' }}>
+    <section className="world-section animate-fade-up fade-delay-4">
       <h2 className="section-title">
         <Globe2 size={16} />
         <span>Saved Locations</span>
@@ -53,7 +54,7 @@ export function WorldCities({ unit, savedCities, onCitySelect }: WorldCitiesProp
             return (
               <div key={idx} className="world-city-card skeleton">
                 <div className="wc-city">{city.name}</div>
-                <div className="wc-country">{city.admin1 ? `${city.admin1}, ${city.country}` : city.country}</div>
+                <div className="wc-country">{regionOf(city)}</div>
                 <div className="wc-temp">--°</div>
                 <div className="wc-desc">Loading...</div>
               </div>
@@ -74,7 +75,7 @@ export function WorldCities({ unit, savedCities, onCitySelect }: WorldCitiesProp
                 <Icon size={24} className="wc-icon" />
               </div>
               <div className="wc-city">{city.name}</div>
-              <div className="wc-country">{city.admin1 ? `${city.admin1}, ${city.country}` : city.country}</div>
+              <div className="wc-country">{regionOf(city)}</div>
               <div className="wc-temp">{Math.round(c.temperature_2m)}°</div>
               <div className="wc-desc">{info.label}</div>
             </div>

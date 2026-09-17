@@ -1,5 +1,6 @@
 import { MapPin } from 'lucide-react';
-import type { WeatherData, CityMeta } from '../types';
+import { regionOf } from '../utils/city';
+import type { CityMeta, TemperatureUnit, TimeFormat, WeatherData } from '../types';
 import { getWMO } from '../services/weather';
 import { getWeatherIcon } from '../utils/iconMap';
 import './HeroCard.css';
@@ -7,8 +8,8 @@ import './HeroCard.css';
 interface HeroCardProps {
   weather: WeatherData;
   cityMeta: CityMeta;
-  unit: 'celsius' | 'fahrenheit';
-  timeFormat: '12h' | '24h';
+  unit: TemperatureUnit;
+  timeFormat: TimeFormat;
 }
 
 export function HeroCard({ weather, cityMeta, timeFormat, unit }: HeroCardProps) {
@@ -35,7 +36,7 @@ export function HeroCard({ weather, cityMeta, timeFormat, unit }: HeroCardProps)
           <div className="location-info">
             <div className="location-badge">
               <MapPin size={14} />
-              <span>{cityMeta.admin1 ? `${cityMeta.admin1}, ${cityMeta.country}` : (cityMeta.country || cityMeta.countryCode)}</span>
+              <span>{regionOf(cityMeta)}</span>
             </div>
             <h1 className="hero-city">{cityMeta.name}</h1>
             <p className="hero-datetime">{dateStr}</p>

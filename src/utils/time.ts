@@ -1,3 +1,5 @@
+import type { TimeFormat } from '../types';
+
 // Open-Meteo is queried with `timezone: 'auto'`, so every timestamp it returns
 // ("2026-09-07T23:00") is the city's own wall clock and carries no offset.
 // Handing one to `new Date()` reads it in the *browser's* zone instead, which
@@ -33,7 +35,7 @@ export function wallClockMs(naiveIso: string): number {
 }
 
 /** A wall-clock string rendered in the viewer's preferred 12h/24h format. */
-export function formatWallClockTime(naiveIso: string, format: '12h' | '24h'): string {
+export function formatWallClockTime(naiveIso: string, format: TimeFormat): string {
   if (!naiveIso) return '--';
   const hour = Number(naiveIso.slice(11, 13));
   const minutes = naiveIso.slice(14, 16);

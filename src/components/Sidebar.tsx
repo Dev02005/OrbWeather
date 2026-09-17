@@ -2,6 +2,7 @@ import type { CityMeta } from '../types';
 import type { ViewId } from '../routes';
 import { fetchSuggestions } from '../services/geocoding';
 import { isAbortError } from '../services/weather';
+import { cityKey, sameCity, regionOf } from '../utils/city';
 import { useState, useEffect, useRef } from 'react';
 import type { KeyboardEvent } from 'react';
 import { Search, MapPin, Check, Settings, HelpCircle, Info, Map, X } from 'lucide-react';
@@ -18,13 +19,6 @@ interface SidebarProps {
   onNavigate: (view: ViewId) => void;
   onCurrentLocation: () => Promise<void>;
 }
-
-/** Cities can share a name, so identity is name plus coordinates. */
-const cityKey = (city: CityMeta) => `${city.name}@${city.lat},${city.lon}`;
-const sameCity = (a: CityMeta, b: CityMeta) => cityKey(a) === cityKey(b);
-
-const regionOf = (city: CityMeta) =>
-  city.admin1 ? `${city.admin1}, ${city.country}` : city.country;
 
 export function Sidebar({
   currentCity,
@@ -173,7 +167,7 @@ export function Sidebar({
                   onMouseEnter={() => setActiveIndex(idx)}
                 >
                   <MapPin size={14} className="suggestion-icon" aria-hidden="true" />
-                  <div style={{ flex: 1 }}>
+                  <div className="suggestion-text">
                     <div className="suggestion-name">{city.name}</div>
                     <div className="suggestion-country">{regionOf(city)}</div>
                   </div>
@@ -184,10 +178,10 @@ export function Sidebar({
           )}
         </div>
 
-        <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div className="sidebar-actions">
           <button className="footer-btn" onClick={handleLocateClick} disabled={loadingAction === 'current'}>
             <MapPin size={16} aria-hidden="true" />
-            <span style={{ flex: 1, textAlign: 'left' }}>Use Current Location</span>
+            <span className="footer-btn-label">Use Current Location</span>
             {loadingAction === 'current' && <div className="btn-spinner" />}
           </button>
           <button className="footer-btn" onClick={() => { onNavigate('radar'); onClose(); }}>
@@ -244,7 +238,7 @@ export function Sidebar({
           </div>
         </div>
 
-        <div style={{ marginTop: 'auto' }}>
+        <div className="sidebar-settings">
           <button className="footer-btn" onClick={() => { onNavigate('settings'); onClose(); }}>
             <Settings size={16} aria-hidden="true" />
             <span>Settings</span>

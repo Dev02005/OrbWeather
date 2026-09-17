@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Clock, CalendarDays, Droplets } from 'lucide-react';
-import type { WeatherData } from '../types';
+import type { TimeFormat, WeatherData } from '../types';
 import { getWMO } from '../services/weather';
 import { getWeatherIcon } from '../utils/iconMap';
 import { cityNow } from '../utils/time';
@@ -9,7 +9,7 @@ import './Forecast.css';
 
 interface ForecastProps {
   weather: WeatherData;
-  timeFormat: '12h' | '24h';
+  timeFormat: TimeFormat;
 }
 
 export function Forecast({ weather, timeFormat }: ForecastProps) {
@@ -45,7 +45,7 @@ export function Forecast({ weather, timeFormat }: ForecastProps) {
   }));
 
   return (
-    <div className="forecast-container animate-fade-up" style={{ animationDelay: '0.2s' }}>
+    <div className="forecast-container animate-fade-up fade-delay-2">
       
       {/* 24-Hour Forecast */}
       <section className="forecast-card">
@@ -65,7 +65,7 @@ export function Forecast({ weather, timeFormat }: ForecastProps) {
                 {h.pop > 0 ? (
                   <span className="hourly-pop"><Droplets size={10}/> {h.pop}%</span>
                 ) : (
-                  <span className="hourly-pop" style={{ opacity: 0 }}>0%</span>
+                  <span className="hourly-pop hourly-pop-empty" aria-hidden="true">0%</span>
                 )}
               </div>
             );
@@ -103,7 +103,6 @@ export function Forecast({ weather, timeFormat }: ForecastProps) {
                   tabIndex={0}
                   aria-expanded={selectedDayIndex === idx}
                   aria-label={`${d.isToday ? 'Today' : formatDay(d.time)}: ${info.label}, high ${Math.round(d.hi)} degrees, low ${Math.round(d.lo)} degrees. Show hourly detail.`}
-                  style={{ cursor: 'pointer' }}
                 >
                   <span className="weekly-day">{d.isToday ? 'Today' : formatDay(d.time)}</span>
                   <div className="weekly-icon-wrapper">
@@ -126,11 +125,10 @@ export function Forecast({ weather, timeFormat }: ForecastProps) {
                 {selectedDayIndex === idx && (
                   <div className="weekly-expanded-hourly animate-fade-up">
                     <div
-                      className="hourly-scroll"
+                      className="hourly-scroll hourly-scroll-nested"
                       tabIndex={0}
                       role="region"
                       aria-label={`Hourly forecast for ${d.isToday ? 'today' : formatDay(d.time)}`}
-                      style={{ background: 'rgba(0,0,0,0.1)', borderRadius: '12px', padding: '12px' }}
                     >
                       {/* Match on the day itself rather than assuming a fixed
                           24-hour stride into the hourly series. */}
@@ -152,7 +150,7 @@ export function Forecast({ weather, timeFormat }: ForecastProps) {
                             {hPop > 0 ? (
                               <span className="hourly-pop"><Droplets size={10}/> {hPop}%</span>
                             ) : (
-                              <span className="hourly-pop" style={{ opacity: 0 }}>0%</span>
+                              <span className="hourly-pop hourly-pop-empty" aria-hidden="true">0%</span>
                             )}
                           </div>
                         );

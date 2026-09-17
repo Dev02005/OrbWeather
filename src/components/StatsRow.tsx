@@ -1,12 +1,12 @@
 import { Droplets, Wind, Eye, Gauge, Sunrise, Sunset, Navigation } from 'lucide-react';
-import type { WeatherData } from '../types';
+import type { TemperatureUnit, TimeFormat, WeatherData } from '../types';
 import { formatWallClockTime } from '../utils/time';
 import './StatsRow.css';
 
 interface StatsRowProps {
   weather: WeatherData;
-  unit: 'celsius' | 'fahrenheit';
-  timeFormat: '12h' | '24h';
+  unit: TemperatureUnit;
+  timeFormat: TimeFormat;
 }
 
 function degreesToCardinal(deg: number) {
@@ -25,7 +25,7 @@ export function StatsRow({ weather, unit, timeFormat }: StatsRowProps) {
     : '--';
 
   return (
-    <section className="stats-row animate-fade-up" style={{ animationDelay: '0.1s' }}>
+    <section className="stats-row animate-fade-up fade-delay-1">
       
       <div className="stat-card">
         <Droplets className="stat-icon text-blue" />

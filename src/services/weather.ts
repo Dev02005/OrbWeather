@@ -1,4 +1,4 @@
-import type { Coordinates, WeatherData, AirQualityData } from '../types';
+import type { AirQualityData, Coordinates, TemperatureUnit, WeatherData } from '../types';
 
 const WEATHER_API = 'https://api.open-meteo.com/v1/forecast';
 const AQ_API = 'https://air-quality-api.open-meteo.com/v1/air-quality';
@@ -10,7 +10,7 @@ export function isAbortError(error: unknown): boolean {
 
 export async function fetchWeather(
   coords: Coordinates,
-  unit: 'celsius' | 'fahrenheit',
+  unit: TemperatureUnit,
   signal?: AbortSignal
 ): Promise<{ weather: WeatherData; aq: AirQualityData }> {
   const unitParam = unit === 'celsius' ? 'celsius' : 'fahrenheit';

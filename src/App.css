@@ -160,3 +160,10 @@
   .mobile-topbar { display: flex; }
   .weather-dashboard { padding: 20px 16px; }
 }
+
+/* UV / moon and daylight cards: side by side, stacking when narrow. */
+.dashboard-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 24px;
+}

@@ -67,7 +67,7 @@ export function RadarMap({ currentCity, onLocationSelect }: RadarMapProps) {
           maxBounds={[[-90, -180], [90, 180]]}
           maxBoundsViscosity={1.0}
           scrollWheelZoom={true} 
-          style={{ height: '100%', width: '100%', borderRadius: '12px' }}
+          className="radar-map"
         >
           {/* Base Map */}
           <TileLayer

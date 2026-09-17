@@ -135,6 +135,12 @@ input { font-family: var(--font-primary); }
   animation: fadeInUp 0.5s ease both;
 }
 
+/* Staggered entrance delays for cards that fade in together. */
+.fade-delay-1 { animation-delay: 0.1s; }
+.fade-delay-2 { animation-delay: 0.2s; }
+.fade-delay-3 { animation-delay: 0.3s; }
+.fade-delay-4 { animation-delay: 0.4s; }
+
 .dark-theme {
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;

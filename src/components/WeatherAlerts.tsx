@@ -11,17 +11,16 @@ import {
   enableAlerts,
   sendTestAlert,
 } from '../utils/push';
-import type { CityMeta } from '../types';
+import { sameCity } from '../utils/city';
+import type { CityMeta, TimeFormat } from '../types';
 
 interface WeatherAlertsProps {
   currentCity: CityMeta | null;
-  timeFormat: '12h' | '24h';
+  timeFormat: TimeFormat;
 }
 
 type Status = 'checking' | 'dev' | 'unsupported' | 'needs-install' | 'blocked' | 'off' | 'on';
 type Busy = null | 'enable' | 'disable' | 'test';
-
-const sameCity = (a: CityMeta, b: CityMeta) => a.lat === b.lat && a.lon === b.lon;
 
 function initialStatus(): Status {
   // The service worker is only registered in production builds.

@@ -35,7 +35,7 @@ export function AirQuality({ aq }: AirQualityProps) {
   ];
 
   return (
-    <section className="aq-section animate-fade-up" style={{ animationDelay: '0.3s' }}>
+    <section className="aq-section animate-fade-up fade-delay-3">
       <h2 className="section-title">
         <Wind size={16} />
         <span>Air Quality Index</span>
