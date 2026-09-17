@@ -57,15 +57,34 @@ a:hover { text-decoration: underline; }
 button { cursor: pointer; border: none; background: none; font-family: var(--font-primary); }
 input { font-family: var(--font-primary); }
 
-/* A red-edged caution box used on the About and Terms pages. */
-.notice {
-  margin: 8px 0;
-  padding: 16px;
-  border-left: 4px solid var(--accent-rose);
-  border-radius: var(--radius-sm);
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--text-primary);
+/* A calm note for disclaimers on the content pages (see Callout.tsx). */
+.callout {
+  display: flex;
+  gap: 12px;
+  margin: 8px 0 24px;
+  padding: 16px 20px;
+  border: 1px solid rgba(14, 165, 233, 0.25);
+  border-radius: var(--radius-md);
+  background: rgba(14, 165, 233, 0.08);
   line-height: 1.6;
+}
+
+.callout-icon {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: var(--accent-blue-text);
+}
+
+.callout-title {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--text-primary);
+}
+
+.callout .callout-text {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
 }
 
 /* Visible only to screen readers, until focused (the skip link). */

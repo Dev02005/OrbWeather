@@ -1,19 +1,11 @@
-import './Standalone.css';
+import { StandaloneLayout, type PageSection } from './StandaloneLayout';
 
-export function PrivacyPolicy() {
-  return (
-    <div className="standalone-container">
-      <h1 className="standalone-title">Privacy Policy</h1>
-      <div className="standalone-content">
-        <p className="standalone-updated">Last updated: September 13, 2026</p>
-
-        <p>
-          Your privacy matters to us. This policy explains what information OrbWeather uses, where
-          it goes, and how you stay in control of it. OrbWeather has no user accounts, shows no
-          advertising and uses no analytics or tracking scripts.
-        </p>
-
-        <h2>Information We Use</h2>
+const SECTIONS: PageSection[] = [
+  {
+    id: 'information-we-use',
+    title: 'Information We Use',
+    content: (
+      <>
         <p>
           <strong>Location:</strong> if you choose to use your current location, your browser
           shares your coordinates with OrbWeather. They are used to fetch the weather for that
@@ -32,10 +24,16 @@ export function PrivacyPolicy() {
         <p>
           <strong>Offline copies:</strong> to keep working without a connection, OrbWeather saves a
           copy of the app and of the most recent forecasts it loaded in your browser’s cache, again
-          on your device only. Clearing your browser’s site data removes them.
+          on your device only.
         </p>
-
-        <h2>How We Use Your Information</h2>
+      </>
+    ),
+  },
+  {
+    id: 'how-we-use-it',
+    title: 'How We Use Your Information',
+    content: (
+      <>
         <p>Only to run OrbWeather:</p>
         <ul>
           <li>to show weather conditions, forecasts, the interactive map and air quality;</li>
@@ -43,8 +41,14 @@ export function PrivacyPolicy() {
           <li>to remember your settings and saved cities.</li>
         </ul>
         <p>We never sell or share your information for advertising or any other purpose.</p>
-
-        <h2>Weather Alerts (Optional)</h2>
+      </>
+    ),
+  },
+  {
+    id: 'weather-alerts',
+    title: 'Weather Alerts (Optional)',
+    content: (
+      <>
         <p>
           Weather alerts are off unless you turn them on in Settings. Because alerts must reach your
           device while OrbWeather is closed, turning them on stores a small record on our server
@@ -63,19 +67,24 @@ export function PrivacyPolicy() {
         </ul>
         <p>
           We do not collect your name, email address or any account details, and we use this record
-          for nothing except sending you weather alerts. It is kept in a database hosted by Upstash.
+          for nothing except sending you weather alerts.
         </p>
         <p>
           Turning alerts off in Settings deletes the record immediately. If your browser stops
           accepting notifications — for example, after you uninstall the app or clear its data —
           the record is deleted automatically the next time we try to reach it.
         </p>
-
-        <h2>Third-Party Services</h2>
+      </>
+    ),
+  },
+  {
+    id: 'third-party-services',
+    title: 'Third-Party Services',
+    content: (
+      <>
         <p>
-          To work, OrbWeather contacts the services below directly from your browser. Like any
-          website, each one receives your IP address along with the request, and handles it under
-          its own privacy policy.
+          To work, OrbWeather contacts the services below. Like any website, each one receives your
+          IP address along with the request, and handles it under its own privacy policy.
         </p>
         <ul>
           <li><strong>Open-Meteo</strong> — weather forecasts, air quality and city search. Receives the coordinates or city name you look up.</li>
@@ -83,27 +92,100 @@ export function PrivacyPolicy() {
           <li><strong>OpenStreetMap</strong> — supplies the map images for the area you view.</li>
           <li><strong>Google Fonts</strong> — supplies the typefaces the app is displayed in.</li>
           <li><strong>Vercel</strong> — hosts OrbWeather and its alert server, and processes standard request information such as IP addresses to deliver them.</li>
+          <li><strong>Upstash</strong> — hosts the database that holds weather alert records.</li>
           <li><strong>Browser push services</strong> (Google, Apple, Mozilla or Microsoft, depending on your browser) — deliver weather alerts, if you turn them on.</li>
         </ul>
-
-        <h2>Your Choices</h2>
-        <ul>
-          <li>You never have to share your location — you can search for a city instead.</li>
-          <li>Turn weather alerts off at any time in Settings, which deletes their server record.</li>
-          <li>Clear your browser’s data for OrbWeather to erase everything stored on your device.</li>
-        </ul>
-
-        <h2>Changes to This Policy</h2>
+      </>
+    ),
+  },
+  {
+    id: 'cookies',
+    title: 'Cookies and Tracking',
+    content: (
+      <p>
+        OrbWeather does not use cookies, analytics, advertising identifiers or tracking pixels. The
+        local storage and offline copies described above stay in your browser, are read only by
+        OrbWeather to run the app, and are never used to follow you across other websites.
+      </p>
+    ),
+  },
+  {
+    id: 'storage-and-security',
+    title: 'Data Storage and Security',
+    content: (
+      <>
         <p>
-          We may update this policy from time to time, and the date at the top will change when we
-          do. Continuing to use OrbWeather after an update means you accept the revised policy.
+          Everything described above stays on your own device, with one exception: the optional
+          weather alert record, which is stored on servers in the United States. If you turn on
+          alerts from another country, that record is transferred to and kept in the United States.
         </p>
-
-        <h2>Contact</h2>
         <p>
-          Questions about your privacy? <a href="/contact">Contact us</a>.
+          All connections to OrbWeather and to the services it uses are encrypted with HTTPS, and
+          alert notifications are encrypted so that only your browser can read them — not the push
+          service that carries them. No system is perfectly secure, so we keep what we store to the
+          minimum needed to run the app.
         </p>
-      </div>
-    </div>
+      </>
+    ),
+  },
+  {
+    id: 'children',
+    title: 'Children’s Privacy',
+    content: (
+      <p>
+        OrbWeather is a general-audience service. It never asks for a name, email address or any
+        other contact details, and it does not knowingly collect personal information from
+        children.
+      </p>
+    ),
+  },
+  {
+    id: 'your-choices',
+    title: 'Your Choices',
+    content: (
+      <ul>
+        <li>You never have to share your location — you can search for a city instead.</li>
+        <li>Turn weather alerts off at any time in Settings, which deletes their server record.</li>
+        <li>Clear your browser’s site data for OrbWeather to erase everything stored on your device.</li>
+      </ul>
+    ),
+  },
+  {
+    id: 'changes',
+    title: 'Changes to This Policy',
+    content: (
+      <p>
+        We may update this policy from time to time, and the date at the top will change when we
+        do. Continuing to use OrbWeather after an update means you accept the revised policy.
+      </p>
+    ),
+  },
+  {
+    id: 'contact',
+    title: 'Contact',
+    content: (
+      <p>
+        Questions about your privacy? Email{' '}
+        <a href="mailto:orbwheather@gmail.com">orbwheather@gmail.com</a> or visit our{' '}
+        <a href="/contact">Contact page</a>.
+      </p>
+    ),
+  },
+];
+
+export function PrivacyPolicy() {
+  return (
+    <StandaloneLayout
+      title="Privacy Policy"
+      updated="September 17, 2026"
+      intro={
+        <p>
+          This policy explains what information OrbWeather uses, where it goes, and how you stay in
+          control of it. In short: OrbWeather has no user accounts, shows no advertising and uses no
+          analytics or tracking.
+        </p>
+      }
+      sections={SECTIONS}
+    />
   );
 }

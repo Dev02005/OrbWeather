@@ -64,9 +64,9 @@ export const ROUTES: RouteDefinition[] = [
   {
     path: '/about',
     view: 'about',
-    title: 'About OrbWeather — Data Sources and How It Works',
+    title: 'About OrbWeather — Free, Private Weather Forecasts',
     description:
-      'What OrbWeather is, where its data comes from, and how it is built.',
+      'What OrbWeather does, where its weather, air quality and map data come from, and how it keeps your information private.',
     priority: 0.6,
   },
   {

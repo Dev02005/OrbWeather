@@ -27,10 +27,11 @@ OrbWeather/
 ├── src/
 │   ├── services/       # Open-Meteo + BigDataCloud clients (typed, abortable)
 │   ├── components/     # UI components (HeroCard, Forecast, Sidebar, ...)
-│   │   └── views/      # Full-page views (Settings, Faq, About, RadarMap)
+│   │   └── views/      # Full-page views (Settings, Faq, About, RadarMap) and the
+│   │                   #   Privacy, Terms and Contact pages with their shared layout
 │   ├── contexts/       # Toast provider and its hook
 │   ├── hooks/          # useRoute (routing + metadata), useInstallPrompt (install flow)
-│   ├── utils/          # time, forecast, precipitation, storage, push, platform, iconMap (+ tests)
+│   ├── utils/          # location, city, time, forecast, precipitation, storage, push, platform, iconMap (+ tests)
 │   ├── routes.ts       # Single route table, shared with the prerender step
 │   ├── App.tsx         # Dashboard shell and app state
 │   ├── main.tsx        # Entry point, error boundary, SW registration
