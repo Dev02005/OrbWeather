@@ -159,21 +159,20 @@ function App() {
     if (import.meta.env.PROD) syncAlerts(timeFormat).catch(() => undefined);
   }, [timeFormat]);
 
-  // Restore the last city, or ask for location if there is none — once, on first load.
-  const restored = useRef(false);
+  // Restore the last city, or ask for location if there is none. `loadWeather`
+  // never changes, so this runs on first load only. No run-once guard: React's
+  // development double-mount cancels the first request, and the second run
+  // must be free to start it again.
   useEffect(() => {
-    if (restored.current) return;
-    restored.current = true;
-
     const lastCity = readCity(STORAGE_KEYS.lastCity);
     if (lastCity) {
       setCurrentCity(lastCity);
-      loadWeather(lastCity, unit);
+      loadWeather(lastCity, readEnum(STORAGE_KEYS.unit, UNITS, 'celsius'));
       return;
     }
     setShowLocationPrompt(true);
     setLoading(false);
-  }, [loadWeather, unit]);
+  }, [loadWeather]);
 
   /** Finds the device, loads its weather, and reports how it went. */
   const detectLocation = useCallback(async (): Promise<
