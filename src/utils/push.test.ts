@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { alertSupport, urlBase64ToUint8Array } from './push';
+import { AlertsError, alertSupport, sendTestAlert, syncAlerts, urlBase64ToUint8Array } from './push';
 import { isIOS, isStandalone } from './platform';
+import { STORAGE_KEYS } from './storage';
 
 const IPHONE_UA =
   'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1';
@@ -109,5 +110,139 @@ describe('urlBase64ToUint8Array', () => {
     const key = Buffer.alloc(65, 7);
     key[0] = 4; // uncompressed point marker
     expect(urlBase64ToUint8Array(key.toString('base64url'))).toHaveLength(65);
+  });
+});
+
+describe('repairing a device the alert server cannot reach', () => {
+  const CITY = { name: 'Bhimunipatnam', country: 'India', countryCode: 'IN', lat: 17.89, lon: 83.45 };
+  const SERVER_KEY = Buffer.alloc(65, 4).toString('base64url');
+  const OLD_KEY = Buffer.alloc(65, 9).toString('base64url');
+
+  interface Device {
+    /** Status codes /api/test-push answers with, in order; 200 once they run out. */
+    testStatuses?: number[];
+    subscribed?: boolean;
+    subscriptionKey?: string;
+  }
+
+  /**
+   * A browser holding a push subscription, talking to a scripted alert server.
+   * `calls` records each request by path and the device it was for, so tests
+   * can assert the exact repair sequence.
+   */
+  function device({ testStatuses = [], subscribed = true, subscriptionKey = SERVER_KEY }: Device = {}) {
+    browser({ userAgent: ANDROID_UA, pushApis: true });
+    vi.stubGlobal('Notification', { permission: 'granted' });
+
+    let issued = 0;
+    const makeSubscription = (key: string) => {
+      const endpoint = `https://fcm.googleapis.com/fcm/send/device-${++issued}`;
+      return {
+        endpoint,
+        options: { applicationServerKey: urlBase64ToUint8Array(key).buffer },
+        toJSON: () => ({ endpoint, keys: { p256dh: 'p256dh', auth: 'auth' } }),
+        unsubscribe: async () => {
+          current = null;
+          return true;
+        },
+      };
+    };
+    let current: ReturnType<typeof makeSubscription> | null = subscribed ? makeSubscription(subscriptionKey) : null;
+
+    const registration = {
+      pushManager: {
+        getSubscription: async () => current,
+        subscribe: async () => (current = makeSubscription(SERVER_KEY)),
+      },
+    };
+    Object.assign(navigator, {
+      serviceWorker: { ready: Promise.resolve(registration), getRegistration: async () => registration },
+    });
+
+    const storage = new Map([[STORAGE_KEYS.alertsCity as string, JSON.stringify(CITY)]]);
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) => storage.get(key) ?? null,
+      setItem: (key: string, value: string) => storage.set(key, value),
+      removeItem: (key: string) => storage.delete(key),
+    });
+
+    const calls: string[] = [];
+    const statuses = [...testStatuses];
+    const deviceOf = (endpoint: string) => endpoint.split('/').pop();
+    vi.stubGlobal('fetch', async (path: string, init?: RequestInit) => {
+      const body = init?.body ? JSON.parse(String(init.body)) : undefined;
+      switch (path) {
+        case '/api/push-key':
+          calls.push('push-key');
+          return Response.json({ publicKey: SERVER_KEY });
+        case '/api/subscribe':
+          calls.push(`subscribe ${deviceOf(body.subscription.endpoint)}`);
+          return Response.json({ ok: true });
+        default: {
+          calls.push(`test ${deviceOf(body.endpoint)}`);
+          const status = statuses.shift() ?? 200;
+          return Response.json(status === 200 ? { ok: true } : { error: `Failed with ${status}` }, { status });
+        }
+      }
+    });
+
+    return { calls, storage };
+  }
+
+  it('sends the test straight away when the server knows the device', async () => {
+    const { calls } = device();
+    await sendTestAlert('12h');
+    expect(calls).toEqual(['test device-1']);
+  });
+
+  // The bug this guards: Settings said alerts were on while the server had no
+  // record, and the test button only answered "not subscribed".
+  it('registers the same subscription again when the server has lost its record', async () => {
+    const { calls } = device({ testStatuses: [404] });
+    await sendTestAlert('12h');
+    expect(calls).toEqual(['test device-1', 'push-key', 'subscribe device-1', 'test device-1']);
+  });
+
+  it('replaces a subscription the push service has dropped', async () => {
+    const { calls } = device({ testStatuses: [410] });
+    await sendTestAlert('24h');
+    expect(calls).toEqual(['test device-1', 'push-key', 'subscribe device-2', 'test device-2']);
+  });
+
+  it('repairs a lost record and then a dropped subscription in one go', async () => {
+    const { calls } = device({ testStatuses: [404, 410] });
+    await sendTestAlert('12h');
+    expect(calls.filter(call => call.startsWith('test'))).toEqual(['test device-1', 'test device-1', 'test device-2']);
+  });
+
+  it('gives up after two repairs rather than looping', async () => {
+    const { calls } = device({ testStatuses: [404, 404, 404, 404] });
+    await expect(sendTestAlert('12h')).rejects.toMatchObject({ status: 404 });
+    expect(calls.filter(call => call.startsWith('test'))).toHaveLength(3);
+  });
+
+  it('does not re-register for failures a new registration cannot fix', async () => {
+    const { calls } = device({ testStatuses: [429] });
+    await expect(sendTestAlert('12h')).rejects.toBeInstanceOf(AlertsError);
+    expect(calls).toEqual(['test device-1']);
+  });
+
+  it('turns alerts off locally when the browser holds no subscription', async () => {
+    const { calls, storage } = device({ subscribed: false });
+    await expect(sendTestAlert('12h')).rejects.toBeInstanceOf(AlertsError);
+    expect(calls).toEqual([]);
+    expect(storage.has(STORAGE_KEYS.alertsCity)).toBe(false);
+  });
+
+  it('on launch, replaces a subscription made with an old server key', async () => {
+    const { calls } = device({ subscriptionKey: OLD_KEY });
+    await syncAlerts('12h');
+    expect(calls).toEqual(['push-key', 'subscribe device-2']);
+  });
+
+  it('on launch, re-registers a valid subscription as it is', async () => {
+    const { calls } = device();
+    await syncAlerts('12h');
+    expect(calls).toEqual(['push-key', 'subscribe device-1']);
   });
 });

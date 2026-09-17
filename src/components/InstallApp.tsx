@@ -1,28 +1,18 @@
 import { useState } from 'react';
-import { Download, Check } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { useToast } from '../contexts/toast-context';
 import { InstallInstructions } from './InstallInstructions';
 import { useInstallState, promptInstall } from '../hooks/useInstallPrompt';
 
 /**
  * Lets someone install the app long after dismissing the landing page popup.
- * It reads its own state, so an already-installed device sees a confirmation
- * rather than a button that would do nothing.
+ * Settings leaves it out once the app is installed.
  */
 export function InstallApp() {
   const state = useInstallState();
   const [showSteps, setShowSteps] = useState(false);
   const [busy, setBusy] = useState(false);
   const { showToast } = useToast();
-
-  if (state === 'installed') {
-    return (
-      <p className="settings-status">
-        <Check size={16} aria-hidden="true" />
-        OrbWeather is installed on this device.
-      </p>
-    );
-  }
 
   const handleInstall = async () => {
     setBusy(true);

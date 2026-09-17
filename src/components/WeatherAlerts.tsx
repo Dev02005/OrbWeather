@@ -59,7 +59,13 @@ export function WeatherAlerts({ currentCity, timeFormat }: WeatherAlertsProps) {
       const message =
         error instanceof AlertsError ? error.message : 'Something went wrong. Please try again.';
       showToast('Weather Alerts', message, 'error');
-      if (Notification.permission === 'denied') setStatus('blocked');
+      if (Notification.permission === 'denied') {
+        setStatus('blocked');
+      } else if (!readAlertsCity()) {
+        // The failure showed this device is not actually subscribed.
+        setAlertCity(null);
+        setStatus('off');
+      }
     } finally {
       setBusy(null);
     }
@@ -84,7 +90,7 @@ export function WeatherAlerts({ currentCity, timeFormat }: WeatherAlertsProps) {
 
   const handleTest = () =>
     run('test', async () => {
-      await sendTestAlert();
+      await sendTestAlert(timeFormat);
       showToast('Test Sent', 'It should arrive in a few seconds — try closing the app to see it.', 'success');
     });
 
@@ -159,7 +165,9 @@ export function WeatherAlerts({ currentCity, timeFormat }: WeatherAlertsProps) {
         <div className="settings-stack">
           <p className="settings-status">
             <Check size={16} aria-hidden="true" />
-            Alerts are on for <strong>{alertCity?.name ?? 'your city'}</strong>
+            <span>
+              Alerts are on for <strong>{alertCity?.name ?? 'your city'}</strong>
+            </span>
           </p>
           {summary}
           <div className="settings-actions">

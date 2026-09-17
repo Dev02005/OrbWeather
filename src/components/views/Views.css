@@ -281,22 +281,29 @@
   gap: 14px;
 }
 
-.settings-note {
-  font-size: 0.85rem;
+/* Scoped to the section so the general `.view-content p` size does not win. */
+.settings-section .settings-note {
+  font-size: 0.9rem;
   line-height: 1.55;
   color: var(--text-muted);
   max-width: 60ch;
 }
 
-.settings-status {
+/* The text sits in one span so it wraps as a sentence beside the icon. */
+.settings-section .settings-status {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   font-size: 0.95rem;
+  line-height: 1.5;
   color: var(--text-primary);
 }
 
-.settings-status svg { color: var(--accent-emerald); }
+.settings-section .settings-status svg {
+  flex-shrink: 0;
+  margin-top: 0.2em;
+  color: var(--accent-emerald-text);
+}
 
 .settings-actions {
   display: flex;

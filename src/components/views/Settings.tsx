@@ -3,6 +3,7 @@ import { Moon, Sun, Thermometer, Clock, Bell, Download } from 'lucide-react';
 import { useToast } from '../../contexts/toast-context';
 import { WeatherAlerts } from '../WeatherAlerts';
 import { InstallApp } from '../InstallApp';
+import { useInstallState } from '../../hooks/useInstallPrompt';
 import type { CityMeta, TemperatureUnit, Theme, TimeFormat } from '../../types';
 import './Views.css';
 
@@ -84,6 +85,8 @@ export function Settings({
   currentCity,
 }: SettingsProps) {
   const { showToast } = useToast();
+  // Offering to install the app from inside the installed app would be noise.
+  const isInstalled = useInstallState() === 'installed';
 
   return (
     <div className="view-container animate-fade-up">
@@ -103,7 +106,7 @@ export function Settings({
           />
         </SettingsSection>
 
-        <SettingsSection icon={<Thermometer size={20} />} title="Temperature TemperatureUnit">
+        <SettingsSection icon={<Thermometer size={20} />} title="Temperature Unit">
           <OptionGroup
             label="Temperature unit"
             value={unit}
@@ -111,7 +114,7 @@ export function Settings({
             onChange={next => {
               setUnit(next);
               showToast(
-                'TemperatureUnit Updated',
+                'Unit Updated',
                 `Temperature set to ${next === 'celsius' ? 'Celsius (°C)' : 'Fahrenheit (°F)'}.`,
                 'success'
               );
@@ -131,9 +134,11 @@ export function Settings({
           />
         </SettingsSection>
 
-        <SettingsSection icon={<Download size={20} />} title="Install App">
-          <InstallApp />
-        </SettingsSection>
+        {!isInstalled && (
+          <SettingsSection icon={<Download size={20} />} title="Install App">
+            <InstallApp />
+          </SettingsSection>
+        )}
 
         <SettingsSection icon={<Bell size={20} />} title="Weather Alerts">
           <WeatherAlerts currentCity={currentCity} timeFormat={timeFormat} />
